@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void get_user_input();
-void get_user_input() {
+void user_input_to_ARRAY();
+void user_input_to_ARRAY() {
 
     char table_guide[] = {'a', 'b', 'c', 'd', 
                           'e', 'f', 'g', 'h', 
@@ -35,6 +35,6 @@ void get_user_input() {
 
 void main() {
 
-    get_user_input();
+    user_input_to_ARRAY();
 
 }
