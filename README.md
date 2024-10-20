@@ -11,3 +11,7 @@
 - Contents: <br>
     1. userInput_toArray.c<br>
     2. userInput_toArray_toLL.c<br>
+
+### NOTES
+- There will be four(4) inputs, fixed.<br>
+- All inputs are inserted in Array, then passed to LinkedList.<br>
