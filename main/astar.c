@@ -20,8 +20,8 @@ struct astar_LL *astar_LL_HEAD = NULL;
 void fixed_user_input();
 void pass_to_ids_LL(int which_table[], int length);
 void pass_to_astar_LL(int which_table[], int length);
-void print_ids_LL();
-void delete_ids_LL();
+void print_astar_LL();
+void delete_astar_LL();
 
 void fixed_user_input() {
 
@@ -50,23 +50,23 @@ void fixed_user_input() {
                             13, 14, 15, 12
                         };
 
-    pass_to_ids_LL(easy_table, 16);
-    pass_to_ids_LL(medium_table, 16);
-    pass_to_ids_LL(hard_table, 16);
-    pass_to_ids_LL(worst_table, 16);
+    pass_to_astar_LL(easy_table, 16);
+    pass_to_astar_LL(medium_table, 16);
+    pass_to_astar_LL(hard_table, 16);
+    pass_to_astar_LL(worst_table, 16);
 
 }
 
-void pass_to_ids_LL(int which_table[], int length) {
+void pass_to_astar_LL(int which_table[], int length) {
 
     int i = 0;
     for(i = 0; i < length; i++) {
 
-        struct ids_LL *new_node = malloc(sizeof(struct ids_LL *));
-        struct ids_LL *iterator = ids_LL_HEAD;
+        struct astar_LL *new_node = malloc(sizeof(struct astar_LL *));
+        struct astar_LL *iterator = astar_LL_HEAD;
         
-        if(ids_LL_HEAD == NULL) {
-            ids_LL_HEAD = new_node;
+        if(astar_LL_HEAD == NULL) {
+            astar_LL_HEAD = new_node;
         } else {
             while(iterator -> next != NULL) {
                 iterator = iterator -> next;
@@ -79,16 +79,16 @@ void pass_to_ids_LL(int which_table[], int length) {
 
     }
     
-    print_ids_LL();
+    print_astar_LL();
 
 }
 
 // Temporary, just to see that array is inserted successfully in linkedlist.
 // Including the counter for 4 digits per row.
 // Used \t to make spaces equal, forming a 4x4 square pattern.
-void print_ids_LL() {
+void print_astar_LL() {
 
-    struct ids_LL *printer = ids_LL_HEAD;
+    struct astar_LL *printer = astar_LL_HEAD;
     int counter = 1;
 
     while(printer != NULL) {
@@ -105,14 +105,14 @@ void print_ids_LL() {
     }
 
     printf("\n");
-    delete_ids_LL();
+    delete_astar_LL();
 
 }
 
-void delete_ids_LL() {
+void delete_astar_LL() {
 
-    struct ids_LL *deleter = ids_LL_HEAD;
-    struct ids_LL *iterator = ids_LL_HEAD;
+    struct astar_LL *deleter = astar_LL_HEAD;
+    struct astar_LL *iterator = astar_LL_HEAD;
 
     while(iterator != NULL) {
         deleter = iterator;
@@ -120,7 +120,7 @@ void delete_ids_LL() {
         free(deleter);
     }
 
-    ids_LL_HEAD = NULL;
+    astar_LL_HEAD = NULL;
 
 }
 
