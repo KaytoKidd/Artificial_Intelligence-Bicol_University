@@ -5,13 +5,38 @@
 - Contents: <br>
     1. singly_linkedlist.c<br>
 
-### User Interaction Parts
-- Contains partial codes of the user interaction parts of the program. <br>
-- This includes getting the user input, inserting it to an array, then insert to linkedlist. <br>
-- Contents: <br>
-    1. userInput_toArray.c<br>
-    2. userInput_toArray_toLL.c<br>
+<br>
+<br>
 
-### NOTES
-- There will be four(4) inputs, fixed.<br>
-- All inputs are inserted in Array, then passed to LinkedList.<br>
+### User Interaction Parts
+- Contains the code(s) for transferring, and using the fixed input given by the project paper.
+- This includes getting the user input, inserting it to an ARRAY, then inserted to LINKEDLIST. <br>
+- Contents:<br>
+    1. user_input.c<br>
+        - Original code for passing ARRAY to LINKEDLIST.<br>
+        - Original code, as a guide.<br>
+        1.1. Type of Input<br>
+            - Easy<br>
+            - Medium<br>
+            - Hard<br>
+            - Worst<br>
+            - All four(4) above are fixed, provided by the project paper.<br>
+    2. userInput_toArray.c
+        - Please neglect.
+    3. userInput_toArray_toLL.c
+        - Please neglect.
+
+<br>
+<br>
+
+### main
+- Contains the actual main code(s) of the project.<br>
+- Contents:<br>
+    1. artificial_intelligence.c<br>
+        - Combination of astar.c and ids.c<br>
+        - Final main code to be passed.<br>
+        - RENAME for final src name.<br>
+    2. astar.c<br>
+        - Contains the main code for calculation using A* Search Slgorithm.<br>
+    3. ids.c<br>
+        - Contains the main code for calculation using IDS Search Algorithm.<br>
