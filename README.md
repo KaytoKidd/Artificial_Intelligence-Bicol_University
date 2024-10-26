@@ -5,9 +5,6 @@
 - Contents: <br>
     1. singly_linkedlist.c<br>
 
-<br>
-<br>
-
 ### User Interaction Parts
 - Contains the code(s) for transferring, and using the fixed input given by the project paper.
 - This includes getting the user input, inserting it to an ARRAY, then inserted to LINKEDLIST. <br>
@@ -28,6 +25,10 @@
 
 <br>
 <br>
+<br>
+
+## DISREGARD ALL ABOVE.
+## FOCUS HERE BELOW.
 
 ### main
 - Contains the actual main code(s) of the project.<br>
