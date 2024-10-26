@@ -1,131 +1,143 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-struct ids_LL {
+void board_guide();
+void get_user_input(char board_guide_label[]);
+void print_user_input(int user_input[]);
 
-    char data;
-    struct ids_LL *next;
+void board_guide() {
 
-};
-struct astar_LL {
+    printf("-------------------------------------------------\n");
+    printf("\t\t   BOARD GUIDE\n");
+    printf("-------------------------------------------------\n");
 
-    char data;
-    struct astar_LL *next;
+    printf("\t+-------+-------+-------+-------+\n");
+    printf("\t|       |       |       |       |\n");
+    printf("\t|   a   |   b   |   c   |   d   |\n");
+    printf("\t|       |       |       |       |\n");
+    printf("\t+-------+-------+-------+-------+\n");
+    printf("\t|       |       |       |       |\n");
+    printf("\t|   e   |   f   |   g   |   h   |\n");
+    printf("\t|       |       |       |       |\n");
+    printf("\t+-------+-------+-------+-------+\n");
+    printf("\t|       |       |       |       |\n");
+    printf("\t|   i   |   j   |   k   |   l   |\n");
+    printf("\t|       |       |       |       |\n");
+    printf("\t+-------+-------+-------+-------+\n");
+    printf("\t|       |       |       |       |\n");
+    printf("\t|   m   |   n   |   o   |   p   |\n");
+    printf("\t|       |       |       |       |\n");
+    printf("\t+-------+-------+-------+-------+\n");
 
-};
+    char board_guide_label[] = {
+        'a', 'b', 'c', 'd',
+        'e', 'f', 'g', 'h',
+        'i', 'j', 'k', 'l',
+        'm', 'n', 'o', 'p'
+    };
 
-struct ids_LL *ids_LL_HEAD = NULL;
-struct astar_LL *astar_LL_HEAD = NULL;
-
-void fixed_user_input();
-void pass_to_ids_LL(int which_table[], int length);
-void pass_to_astar_LL(int which_table[], int length);
-void print_ids_LL();
-void delete_ids_LL();
-
-void fixed_user_input() {
-
-    int easy_table[] = {
-                            4, 2, 3, -1,
-                            5, 1, 6, 7,
-                            8, 9, 10, 11,
-                            12, 13, 14, 15
-                       };
-    int medium_table[] = {
-                            5, 6, 2, 3,
-                            1, -1, 10, 7,
-                            4, 13, 9, 15,
-                            8, 12, 11, 14
-                          };
-    int hard_table[] = {
-                            1, 2, 3, 4,
-                            5, 6, 7, 8,
-                            9, 10, 11, 15,
-                            13, 14, 12, -1
-                       };
-    int worst_table[] = {
-                            1, 6, 2, 3,
-                            5, 10, 7, 4,
-                            9, -1, 11, 8,
-                            13, 14, 15, 12
-                        };
-
-    pass_to_ids_LL(easy_table, 16);
-    pass_to_ids_LL(medium_table, 16);
-    pass_to_ids_LL(hard_table, 16);
-    pass_to_ids_LL(worst_table, 16);
+    get_user_input(board_guide_label);
 
 }
 
-void pass_to_ids_LL(int which_table[], int length) {
+void get_user_input(char board_guide_label[]) {
 
+    int user_input[16];
     int i = 0;
-    for(i = 0; i < length; i++) {
 
-        struct ids_LL *new_node = malloc(sizeof(struct ids_LL *));
-        struct ids_LL *iterator = ids_LL_HEAD;
-        
-        if(ids_LL_HEAD == NULL) {
-            ids_LL_HEAD = new_node;
-        } else {
-            while(iterator -> next != NULL) {
-                iterator = iterator -> next;
-            }
-            iterator -> next = new_node;
-        }
+    printf("-------------------------------------------------\n");
+    printf("\t      Enter \'-1\' for BLANK\n");
+    printf("-------------------------------------------------\n");
 
-        new_node -> data = which_table[i];
-        new_node -> next = NULL;
+    for (i = 0; i < 16; i++) {
+
+        printf("[%c] = ", board_guide_label[i]);
+        scanf("%d", &user_input[i]);
 
     }
-    
-    print_ids_LL();
+
+    print_user_input(user_input);
 
 }
 
-// Temporary, just to see that array is inserted successfully in linkedlist.
-// Including the counter for 4 digits per row.
-// Used \t to make spaces equal, forming a 4x4 square pattern.
-void print_ids_LL() {
+void print_user_input(int user_input[]) {
 
-    struct ids_LL *printer = ids_LL_HEAD;
-    int counter = 1;
+    printf("-------------------------------------------------\n");
+    printf("\t\t  CREATED TABLE\n");
+    printf("-------------------------------------------------\n");
+    int i = 0;
 
-    while(printer != NULL) {
-
-        if(printer -> data == -1)
-            printf(" \t");
-        else
-            printf("%d\t", printer -> data);
-
-        printer = printer -> next;
-        if(counter % 4 == 0)
-            printf("\n");
-        counter += 1;
+    printf("\t+-------+-------+-------+-------+\n");
+    printf("\t|       |       |       |       |\n\t|");
+    for (i = 0; i <= 3; i++) {
+        if (user_input[i] >= 10 || user_input[i] == -1) {printf("   %d  |", user_input[i]);} else {printf("   %d   |", user_input[i]);}
     }
-
-    printf("\n");
-    delete_ids_LL();
-
-}
-
-void delete_ids_LL() {
-
-    struct ids_LL *deleter = ids_LL_HEAD;
-    struct ids_LL *iterator = ids_LL_HEAD;
-
-    while(iterator != NULL) {
-        deleter = iterator;
-        iterator = iterator -> next;
-        free(deleter);
+    printf("\n\t|       |       |       |       |\n");
+    printf("\t+-------+-------+-------+-------+\n");
+    printf("\t|       |       |       |       |\n\t|");
+    for (i = 4; i <= 7; i++) {
+        if (user_input[i] >= 10 || user_input[i] == -1) {printf("   %d  |", user_input[i]);} else {printf("   %d   |", user_input[i]);}
     }
-
-    ids_LL_HEAD = NULL;
+    printf("\n\t|       |       |       |       |\n");
+    printf("\t+-------+-------+-------+-------+\n");
+    printf("\t|       |       |       |       |\n\t|");
+    for (i = 8; i <= 11; i++) {
+        if (user_input[i] >= 10 || user_input[i] == -1) {printf("   %d  |", user_input[i]);} else {printf("   %d   |", user_input[i]);}
+    }
+    printf("\n\t|       |       |       |       |\n");
+    printf("\t+-------+-------+-------+-------+\n");
+    printf("\t|       |       |       |       |\n\t|");
+    for (i = 12; i <= 15; i++) {
+        if (user_input[i] >= 10 || user_input[i] == -1) {printf("   %d  |", user_input[i]);} else {printf("   %d   |", user_input[i]);}
+    }
+    printf("\n\t|       |       |       |       |\n");
+    printf("\t+-------+-------+-------+-------+\n");
 
 }
 
 void main() {
-
-    fixed_user_input();
-
+    board_guide();
 }
+
+/*
+
+temporary
+printf("\t+---------------+---------------+---------------+---------------+\n");
+    printf("\t|\t\t|\t\t|\t\t|\t\t|\n"); printf("\t|\t\t|\t\t|\t\t|\t\t|\n");
+    printf("\t|\ta\t|\tb\t|\tc\t|\td\t|\n");
+    printf("\t|\t\t|\t\t|\t\t|\t\t|\n"); printf("\t|\t\t|\t\t|\t\t|\t\t|\n");
+    printf("\t+---------------+---------------+---------------+---------------+\n");
+    printf("\t|\t\t|\t\t|\t\t|\t\t|\n"); printf("\t|\t\t|\t\t|\t\t|\t\t|\n");
+    printf("\t|\te\t|\tf\t|\tg\t|\th\t|\n");
+    printf("\t|\t\t|\t\t|\t\t|\t\t|\n"); printf("\t|\t\t|\t\t|\t\t|\t\t|\n");
+    printf("\t+---------------+---------------+---------------+---------------+\n");
+    printf("\t|\t\t|\t\t|\t\t|\t\t|\n"); printf("\t|\t\t|\t\t|\t\t|\t\t|\n");
+    printf("\t|\ti\t|\tj\t|\tk\t|\tl\t|\n");
+    printf("\t|\t\t|\t\t|\t\t|\t\t|\n"); printf("\t|\t\t|\t\t|\t\t|\t\t|\n");
+    printf("\t+---------------+---------------+---------------+---------------+\n");
+    printf("\t|\t\t|\t\t|\t\t|\t\t|\n"); printf("\t|\t\t|\t\t|\t\t|\t\t|\n");
+    printf("\t|\tm\t|\tn\t|\to\t|\tp\t|\n");
+    printf("\t|\t\t|\t\t|\t\t|\t\t|\n"); printf("\t|\t\t|\t\t|\t\t|\t\t|\n");
+    printf("\t+---------------+---------------+---------------+---------------+\n");
+
+printf("\t+-------+-------+-------+-------+\n");
+    printf("\t|       |       |       |       |\n");
+    for (i = 0; i <= 3; i++) {
+        if (user_input[i] >= 10) {printf("   %d  |", user_input[i]);} else {printf("   %d   |", user_input[i]);}
+    }
+    printf("\t|   %d   |   %d   |   %d   |   %d   |\n", user_input[0], user_input[1], user_input[2], user_input[3]);
+    printf("\t|       |       |       |       |\n");
+    printf("\t+-------+-------+-------+-------+\n");
+    printf("\t|       |       |       |       |\n");
+    printf("\t|   %d   |   %d   |   %d   |   %d   |\n", user_input[4], user_input[5], user_input[6], user_input[7]);
+    printf("\t|       |       |       |       |\n");
+    printf("\t+-------+-------+-------+-------+\n");
+    printf("\t|       |       |       |       |\n");
+    printf("\t|   %d   |   %d   |   %d   |   %d   |\n", user_input[8], user_input[9], user_input[10], user_input[11]);
+    printf("\t|       |       |       |       |\n");
+    printf("\t+-------+-------+-------+-------+\n");
+    printf("\t|       |       |       |       |\n");
+    printf("\t|   %d   |   %d   |   %d   |   %d   |\n", user_input[12], user_input[13], user_input[14], user_input[15]);
+    printf("\t|       |       |       |       |\n");
+    printf("\t+-------+-------+-------+-------+\n");
+*/
