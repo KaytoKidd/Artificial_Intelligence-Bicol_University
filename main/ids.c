@@ -290,6 +290,66 @@ void expand_this(int deepestNode_level) {
 
 void start_expanding(int the_arr[16], int the_movements[4], int the_movements_label[4]) {
 
+    // ADDING - Add to EXPANDED LinkedList. [START]
+    struct ExpandedLL *expanded_new_node = (struct ExpandedLL *)malloc(sizeof(struct ExpandedLL));
+    struct ExpandedLL *expanded_iterator = expandedLL_head;
+    int z = 0;
+
+    if(expandedLL_head == NULL) {
+        expandedLL_head = expanded_new_node;
+    } else {
+        expanded_iterator = expandedLL_head;
+        while(expanded_iterator -> next != NULL) {
+            expanded_iterator = expanded_iterator -> next;
+        }
+        expanded_iterator -> next = expanded_new_node;
+    }
+
+    for(z = 0; z < 16; z++) {
+        expanded_new_node -> expanded_arr[z] = the_arr[z];
+    }
+    expanded_new_node -> next = NULL;
+    // ADDING - Add to EXPANDED LinkedList. [END]
+
+    // DELETING - Free the node from the FRINGE LinkedList. [START]
+    struct FringeLL *fringe_iterator = fringeLL_head;
+    struct FringeLL *fringe_addressBefore_free = fringeLL_head;
+    struct FringeLL *fringe_adddressTo_free;
+
+    if(fringeLL_head -> next == NULL) { // Means there is only one node, the ROOT (LEVEL 0).
+
+        fringe_adddressTo_free = fringeLL_head;
+        fringeLL_head = NULL;
+        free(fringe_adddressTo_free);
+
+    } else {                            // We need to search first where is the node to be deleted.
+
+        fringe_iterator = fringeLL_head;
+        while(fringe_iterator != NULL) {
+                
+            int x = 0;
+            int total = 0;
+            for(x = 0; x < 16; x++) {   // Loop will automatically end in 16 iterations.
+                if(fringe_iterator -> fringe_arr[x] == the_arr[x])
+                    total++;            // Will have a maximum value of 16.
+                else
+                    break;  // Means that the current array of the current node in the fringe is not what we want.
+            if(total == 16) // Means that all value of the array from this address equals the one to be expanded.
+                break;      // [1] Hence, we have found the address of the node in the fringe to delete.
+            }
+
+            fringe_addressBefore_free = fringe_iterator;    // If [1] is processed, this will not anymore run.
+            fringe_iterator = fringe_iterator -> next;      // If [1] is processed, this will not anymore run.
+        }
+
+        fringe_addressBefore_free -> next = fringe_iterator -> next;
+        fringe_adddressTo_free = fringe_iterator;
+        free(fringe_adddressTo_free);
+        // DELETING - Free the node from the FRINGE LinkedList. [END]
+
+    }
+
+    // EXPANSION/ADDING - Add to FRINGE LinkedList. [START]
     int the_movement = 1;
     int i = 0;
 
@@ -298,73 +358,15 @@ void start_expanding(int the_arr[16], int the_movements[4], int the_movements_la
 
     while(the_movement != 0 || i == 3) {
 
-        struct ExpandedLL *expanded_new_node = (struct ExpandedLL *)malloc(sizeof(struct ExpandedLL)); // used
         struct FringeLL *fringe_new_node = (struct FringeLL *)malloc(sizeof(struct FringeLL));
         struct SolutionPathLL *new_node = (struct SolutionPathLL *)malloc(sizeof(struct SolutionPathLL));
-
-        struct ExpandedLL *expanded_iterator = expandedLL_head; // used
-        struct FringeLL *fringe_iterator = fringeLL_head; // used
-        struct FringeLL *fringe_addressBefore_free = fringeLL_head; // used
-        struct FringeLL *fringe_adddressTo_free; // used
         the_movement = the_movements[i];
-        int z = 0;
 
-        // Expanded LinkedList
-        // ADDING - Add the_arr[16] to EXPANDED LIST.
-        if(expandedLL_head == NULL) {
-            expandedLL_head = expanded_new_node;
-        } else {
-            expanded_iterator = expandedLL_head;
-            while(expanded_iterator -> next != NULL) {
-                expanded_iterator = expanded_iterator -> next;
-            }
-            expanded_iterator -> next = expanded_new_node;
-        }
-
-        for(z = 0; z < 16; z++) {
-            expanded_new_node -> expanded_arr[z] = the_arr[z];
-        }
-        expanded_new_node -> next = NULL;
-
-        // Fringe LinkedList
-        // DELETE - Remove the NODE that contains the_arr[16] content.
-        if(fringeLL_head -> next == NULL) { // Means there is only one node, the ROOT (LEVEL 0).
-
-            fringe_adddressTo_free = fringeLL_head;
-            fringeLL_head = NULL;
-            free(fringe_adddressTo_free);
-
-        } else {    // We need to search first where is node to be deleted.
-
-            fringe_iterator = fringeLL_head;
-            while(fringe_iterator != NULL) {
-                
-                int x = 0;
-                int total = 0;
-                for(x = 0; x < 16; x++) {   // Loop will automatically end in 16 iterations.
-                    if(fringe_iterator -> fringe_arr[x] == the_arr[x])
-                        total++;            // Will have a maximum value of 16.
-                    else
-                        break;  // Means that the current array of the current node in the fringe is not what we want.
-                if(total == 16) // Means that all value of the array from this address equals the one to be expanded.
-                    break;      // [1] Hence, we have found the address of the node in the fringe to delete.
-                }
-
-                fringe_addressBefore_free = fringe_iterator;    // If [1] is processed, this will not anymore run.
-                fringe_iterator = fringe_iterator -> next;      // If [1] is processed, this will not anymore run.
-            }
-
-            fringe_addressBefore_free -> next = fringe_iterator -> next;
-            fringe_adddressTo_free = fringe_iterator;
-            free(fringe_adddressTo_free);
-
-        }
-
-        // Fringe LinkedList
-        // ADDING - Add expansion of the_arr[16] to FRINGE LIST.
+        
 
         i++;
     }
+    // EXPANSION/ADDING - Add to FRINGE LinkedList. [END]
 
 }
 
