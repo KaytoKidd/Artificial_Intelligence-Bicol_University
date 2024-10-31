@@ -51,15 +51,12 @@ void board_guide();
 void get_user_input(char board_guide_label[]);
 void print_user_input(int user_input[]);
 
-// Calculation Functions - Declaration
-void heirarchy_of_movements();
-
 // Inserting Array to LinkedList
 void insert_to_FringeLL(int the_level, int the_arr[16]);
 void print_FringeLL(); // Debugging purposes, DELETE LATER.
 void find_which_to_expand();
 void expand_this(int deepestNode_index);
-void start_expanding(int the_arr[16]);
+void start_expanding(int the_arr[16], int the_movements[4], int the_movements_label[4]);
 
 void board_guide() {
 
@@ -160,35 +157,6 @@ void print_user_input(int user_input[]) {
 
 }
 
-void heirarchy_of_movements() {
-
-    // Hierarchy of Priority: UP -> DOWN -> LEFT -> RIGHT
-    // UP       - 96
-    // DOWN     - 97
-    // LEFT     - 98
-    // RIGHT    - 99
-
-    int movements[16][3][4] = {
-        {{1}, {5, 2}, {96, 99}},
-        {{2}, {6, 1, 3}, {97, 98, 99}},
-        {{3}, {7, 2, 40}, {97, 98, 99}},
-        {{4}, {8, 3}, {97, 98}},
-        {{5}, {1, 9, 6}, {96, 97, 99}},
-        {{6}, {2, 10, 5, 7}, {96, 97, 98, 99}},
-        {{7}, {3, 11, 6, 8}, {96, 97, 98, 99}},
-        {{8}, {4, 12, 7}, {96, 97, 98}},
-        {{9}, {5, 13, 10}, {96, 97, 99}},
-        {{10}, {6, 14, 9, 11}, {96, 97, 98, 99}},
-        {{11}, {7, 15, 10, 12}, {96, 97, 98, 99}},
-        {{12}, {8, 16, 11}, {96, 97, 98}},
-        {{13}, {9, 14}, {96, 99}},
-        {{14}, {10, 13, 15}, {96, 98, 99}},
-        {{15}, {11, 14, 16}, {96, 98, 99}},
-        {{16}, {12, 15}, {96, 98}}
-    };
-
-}
-
 // COMPUTATION START - IDS
 void insert_to_FringeLL(int the_level, int the_arr[16]) {
 
@@ -235,25 +203,25 @@ void print_FringeLL() { // Debugging purposes, DELETE LATER.
 void find_which_to_expand() {
 
     struct FringeLL *finder = fringeLL_head;
-    int deepestNode_index = 0;
+    int deepestNode_level = 0;
     
     if (finder -> next == NULL) {   // The FringeLL contains only one(1) node. Level 0, the ROOT.
-        deepestNode_index = 0;
+        deepestNode_level = 0;
     } else {                        // The FringeLL contains more than one(1) node(s). Level 1, 2, 3, ...
         finder = fringeLL_head;
         while(finder != NULL) {
-            if (deepestNode_index < finder -> level) {
-                deepestNode_index = finder -> level;
+            if (deepestNode_level < finder -> level) {  // Finding the deepest level.
+                deepestNode_level = finder -> level;    // Found the deepest level.
             }
             finder = finder -> next;
         }
     }
 
-    expand_this(deepestNode_index);
+    expand_this(deepestNode_level);
 
 }
 
-void expand_this(int deepestNode_index) {
+void expand_this(int deepestNode_level) {
 
     struct FringeLL *finder = fringeLL_head;
     int index_of_negativeOne = 0;
@@ -261,10 +229,13 @@ void expand_this(int deepestNode_index) {
     int to_expand_arr[16];
     int movements_index_arr[4]; // There are 4 maximum possible movements (UP, DOWN, LEFT, RIGHT).
                                 // Empty values will be set to 0 if there is only 1-3 movements found.
+                                // VALUE = FOUND at the second row, y = 1
+    int movements_label_arr[4]; // Label of what movement it will be.
+                                // VALUE = FOUND at the third row, y = 2
 
     while(finder != NULL) {
-        if (finder -> level == deepestNode_index)   // finder has now the address of the node to expand.
-            break;
+        if (finder -> level == deepestNode_level)   // finder has now the address of the node to expand.
+            break;                                  // The very first node found to have that level is to be expanded.
         finder = finder -> next;
     }
 
@@ -279,23 +250,29 @@ void expand_this(int deepestNode_index) {
         to_expand_arr[i] = finder -> fringe_arr[i];
     }
 
+    // Hierarchy of Priority: UP -> DOWN -> LEFT -> RIGHT
+    // UP       - 96
+    // DOWN     - 97
+    // LEFT     - 98
+    // RIGHT    - 99
+
     int movements[16][3][4] = {
-        {{1}, {5, 2}, {96, 99}},
-        {{2}, {6, 1, 3}, {97, 98, 99}},
-        {{3}, {7, 2, 40}, {97, 98, 99}},
-        {{4}, {8, 3}, {97, 98}},
-        {{5}, {1, 9, 6}, {96, 97, 99}},
-        {{6}, {2, 10, 5, 7}, {96, 97, 98, 99}},
-        {{7}, {3, 11, 6, 8}, {96, 97, 98, 99}},
-        {{8}, {4, 12, 7}, {96, 97, 98}},
-        {{9}, {5, 13, 10}, {96, 97, 99}},
-        {{10}, {6, 14, 9, 11}, {96, 97, 98, 99}},
-        {{11}, {7, 15, 10, 12}, {96, 97, 98, 99}},
-        {{12}, {8, 16, 11}, {96, 97, 98}},
-        {{13}, {9, 14}, {96, 99}},
-        {{14}, {10, 13, 15}, {96, 98, 99}},
-        {{15}, {11, 14, 16}, {96, 98, 99}},
-        {{16}, {12, 15}, {96, 98}}
+        {{1}, {5, 2}, {96, 99}},                    // 0
+        {{2}, {6, 1, 3}, {97, 98, 99}},             // 1
+        {{3}, {7, 2, 40}, {97, 98, 99}},            // 2
+        {{4}, {8, 3}, {97, 98}},                    // 3
+        {{5}, {1, 9, 6}, {96, 97, 99}},             // 4
+        {{6}, {2, 10, 5, 7}, {96, 97, 98, 99}},     // 5
+        {{7}, {3, 11, 6, 8}, {96, 97, 98, 99}},     // 6
+        {{8}, {4, 12, 7}, {96, 97, 98}},            // 7
+        {{9}, {5, 13, 10}, {96, 97, 99}},           // 8
+        {{10}, {6, 14, 9, 11}, {96, 97, 98, 99}},   // 9
+        {{11}, {7, 15, 10, 12}, {96, 97, 98, 99}},  // 10
+        {{12}, {8, 16, 11}, {96, 97, 98}},          // 11
+        {{13}, {9, 14}, {96, 99}},                  // 12
+        {{14}, {10, 13, 15}, {96, 98, 99}},         // 13
+        {{15}, {11, 14, 16}, {96, 98, 99}},         // 14
+        {{16}, {12, 15}, {96, 98}}                  // 15
     };
 
     int x = index_of_negativeOne - 1;   // depth/level  - Will be used once.  (FORMULA: x = index_of_negativeOne - 1)
@@ -303,13 +280,91 @@ void expand_this(int deepestNode_index) {
     int z = 0;                          // column       - One to be iterated. (VALUE = Changing)
 
     for(z = 0; z < 4; z++){ 
-        movements_index_arr[z] = movements[z];
-        // solutionPath_arr[z] = movements[z];     // Level 1 nodes are created. HEPL
+        movements_index_arr[z] = movements[x][y][z];        // Example: 3,11,6,8
+        movements_label_arr[z] = movements[x][y + 1][z];    // Example: 96,97,98,99
     }
+
+    start_expanding(to_expand_arr, movements_index_arr, movements_label_arr);
 
 }
 
-void start_expanding(int the_arr[16]) {
+void start_expanding(int the_arr[16], int the_movements[4], int the_movements_label[4]) {
+
+    int the_movement = 1;
+    int i = 0;
+
+    // the_movement != 0    , means that there can only be <= 3 child of ROOT (LEVEL 0).
+    // i == 3               , means that child of ROOT (LEVEL 0) is exactly 4. Purpose is to stop the while loop.
+
+    while(the_movement != 0 || i == 3) {
+
+        struct ExpandedLL *expanded_new_node = (struct ExpandedLL *)malloc(sizeof(struct ExpandedLL)); // used
+        struct FringeLL *fringe_new_node = (struct FringeLL *)malloc(sizeof(struct FringeLL));
+        struct SolutionPathLL *new_node = (struct SolutionPathLL *)malloc(sizeof(struct SolutionPathLL));
+
+        struct ExpandedLL *expanded_iterator = expandedLL_head; // used
+        struct FringeLL *fringe_iterator = fringeLL_head; // used
+        struct FringeLL *fringe_addressBefore_free = fringeLL_head; // used
+        struct FringeLL *fringe_adddressTo_free; // used
+        the_movement = the_movements[i];
+        int z = 0;
+
+        // Expanded LinkedList
+        // ADDING - Add the_arr[16] to EXPANDED LIST.
+        if(expandedLL_head == NULL) {
+            expandedLL_head = expanded_new_node;
+        } else {
+            expanded_iterator = expandedLL_head;
+            while(expanded_iterator -> next != NULL) {
+                expanded_iterator = expanded_iterator -> next;
+            }
+            expanded_iterator -> next = expanded_new_node;
+        }
+
+        for(z = 0; z < 16; z++) {
+            expanded_new_node -> expanded_arr[z] = the_arr[z];
+        }
+        expanded_new_node -> next = NULL;
+
+        // Fringe LinkedList
+        // DELETE - Remove the NODE that contains the_arr[16] content.
+        if(fringeLL_head -> next == NULL) { // Means there is only one node, the ROOT (LEVEL 0).
+
+            fringe_adddressTo_free = fringeLL_head;
+            fringeLL_head = NULL;
+            free(fringe_adddressTo_free);
+
+        } else {    // We need to search first where is node to be deleted.
+
+            fringe_iterator = fringeLL_head;
+            while(fringe_iterator != NULL) {
+                
+                int x = 0;
+                int total = 0;
+                for(x = 0; x < 16; x++) {   // Loop will automatically end in 16 iterations.
+                    if(fringe_iterator -> fringe_arr[x] == the_arr[x])
+                        total++;            // Will have a maximum value of 16.
+                    else
+                        break;  // Means that the current array of the current node in the fringe is not what we want.
+                if(total == 16) // Means that all value of the array from this address equals the one to be expanded.
+                    break;      // [1] Hence, we have found the address of the node in the fringe to delete.
+                }
+
+                fringe_addressBefore_free = fringe_iterator;    // If [1] is processed, this will not anymore run.
+                fringe_iterator = fringe_iterator -> next;      // If [1] is processed, this will not anymore run.
+            }
+
+            fringe_addressBefore_free -> next = fringe_iterator -> next;
+            fringe_adddressTo_free = fringe_iterator;
+            free(fringe_adddressTo_free);
+
+        }
+
+        // Fringe LinkedList
+        // ADDING - Add expansion of the_arr[16] to FRINGE LIST.
+
+        i++;
+    }
 
 }
 
