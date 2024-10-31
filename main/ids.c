@@ -56,7 +56,7 @@ void insert_to_FringeLL(int the_level, int the_arr[16]);
 void print_FringeLL(); // Debugging purposes, DELETE LATER.
 void find_which_to_expand();
 void expand_this(int deepestNode_index);
-void start_expanding(int the_arr[16], int the_movements[4], int the_movements_label[4]);
+void start_expanding(int the_arr[16], int the_movements[4], int the_movements_label[4], int index_of_negativeOne);
 
 void board_guide() {
 
@@ -284,11 +284,11 @@ void expand_this(int deepestNode_level) {
         movements_label_arr[z] = movements[x][y + 1][z];    // Example: 96,97,98,99
     }
 
-    start_expanding(to_expand_arr, movements_index_arr, movements_label_arr);
+    start_expanding(to_expand_arr, movements_index_arr, movements_label_arr, index_of_negativeOne);
 
 }
 
-void start_expanding(int the_arr[16], int the_movements[4], int the_movements_label[4]) {
+void start_expanding(int the_arr[16], int the_movements[4], int the_movements_label[4], int index_of_negativeOne) {
 
     // ADDING - Add to EXPANDED LinkedList. [START]
     struct ExpandedLL *expanded_new_node = (struct ExpandedLL *)malloc(sizeof(struct ExpandedLL));
@@ -353,20 +353,35 @@ void start_expanding(int the_arr[16], int the_movements[4], int the_movements_la
     int the_movement = 1;
     int i = 0;
 
-    // the_movement != 0    , means that there can only be <= 3 child of ROOT (LEVEL 0).
-    // i == 3               , means that child of ROOT (LEVEL 0) is exactly 4. Purpose is to stop the while loop.
-
-    while(the_movement != 0 || i == 3) {
+    while(the_movement != 0 || i == 3) {    // i == 3 to stop the loop if movements total is 4.
 
         struct FringeLL *fringe_new_node = (struct FringeLL *)malloc(sizeof(struct FringeLL));
-        struct SolutionPathLL *new_node = (struct SolutionPathLL *)malloc(sizeof(struct SolutionPathLL));
         the_movement = the_movements[i];
 
-        
+        /*
+        - Since we already know the index of negative one using index_of_negativeOne, we can use
+        this to exchange with the values of the_movement per iteration 'i' found at the_movements[i].
+
+        LOGIC:
+        - Per iteration, we can exchange the index of index_of_negativeOne with the_movement (which has value of
+        the_movements[i]) and a new array is formed.
+        - Note that the_arr[16] which is passed on the argument should not be changed value as it will be used
+        throughout this function.
+        - TODO:
+            1. Create a new array (new_arr[16]), where this array is passed the value of the_arr[16].
+            2. new_arr[16] will then be the one manipulated (exchange of index of -1 with the_movement).
+            3. Once index is exchanged, pass new_arr[16] to FRINGE using struct malloc.
+            4. LOOP '1.' until the_movement != 0 or i == 3 is true.
+        */
 
         i++;
     }
     // EXPANSION/ADDING - Add to FRINGE LinkedList. [END]
+
+    // ADDING - Add to SOLUTIONPATH LinkedList. [START]
+    struct SolutionPathLL *new_node = (struct SolutionPathLL *)malloc(sizeof(struct SolutionPathLL));
+
+    // ADDING - Add to SOLUTIONPATH LinkedList. [END]
 
 }
 
