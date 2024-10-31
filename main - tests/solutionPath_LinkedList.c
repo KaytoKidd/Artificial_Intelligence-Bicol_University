@@ -26,6 +26,50 @@ struct MyStruct {
 
 struct MyStruct *myStruct_head[4];
 
+void printer();
+void add_newStuff();
+
+void printer() {
+
+    int i = 0;
+
+    for(i = 0; i < 4; i++) {
+
+        struct MyStruct *iterator = myStruct_head[i];
+        while(iterator != NULL) {
+            printf("%d ", iterator -> data);
+            iterator = iterator -> next;
+        }
+        printf("\n");
+
+    }
+
+}
+
+void add_newStuff() {
+
+    int which_head = 0;
+    int insert_val = 0;
+
+    printf("\nWhich head to insert?: ");
+    scanf("%d", &which_head);
+    printf("Enter value to insert: ");
+    scanf("%d", &insert_val);
+    printf("\n");
+
+    struct MyStruct *new_node = (struct MyStruct *)malloc(sizeof(struct MyStruct));
+    struct MyStruct *inserter = myStruct_head[which_head];
+
+    while(inserter -> next != NULL) {
+        inserter = inserter -> next;
+    }
+    inserter -> next = new_node;
+    new_node -> data = insert_val;
+    new_node -> next = NULL;
+
+
+}
+
 void main() {
     
     int myArr[] = {2, 1, 4, 3};
@@ -42,15 +86,12 @@ void main() {
         i++;
     }
 
-    for(i = 0; i < 4; i++) {
-
-        struct MyStruct *iterator = myStruct_head[i];
-        while(iterator != NULL) {
-            printf("%d ", iterator -> data);
-            iterator = iterator -> next;
-        }
-        printf("\n");
-
-    }
+    printer();
+    add_newStuff();
+    printer();
+    add_newStuff();
+    printer();
+    add_newStuff();
+    printer();
 
 }
