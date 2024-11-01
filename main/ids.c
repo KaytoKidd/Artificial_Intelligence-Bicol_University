@@ -59,6 +59,7 @@ void print_FringeLL(); // Debugging purposes, DELETE LATER.
 void find_which_to_expand();
 void expand_this(int deepestNode_index);
 void start_expanding(int the_arr[16], int the_movements[4], int the_movements_label[4], int index_of_negativeOne);
+int check_ifAlready_inExpandedLL(int the_arr[16]);
 
 void board_guide() {
 
@@ -160,6 +161,9 @@ void print_user_input(int user_input[]) {
 }
 
 // COMPUTATION START - IDS
+// This is only used once. That is, from the very start when the program is run.
+// Might be useful if this is the function for inserting to fringe, and not in start_expanding().
+
 void insert_to_FringeLL(int the_level, int the_arr[16]) {
 
     struct FringeLL *new_node = (struct FringeLL *)malloc(sizeof(struct FringeLL));
@@ -292,131 +296,192 @@ void expand_this(int deepestNode_level) {
 
 void start_expanding(int the_arr[16], int the_movements[4], int the_movements_label[4], int index_of_negativeOne) {
 
-    // ADDING - Add to EXPANDED LinkedList. [START]
-    struct ExpandedLL *expanded_new_node = (struct ExpandedLL *)malloc(sizeof(struct ExpandedLL));
-    struct ExpandedLL *expanded_iterator = expandedLL_head;
-    int z = 0;
-    what_level = what_level + 1;
+    /*
+        NOTE:   There are two(2) times where we have to check whether to process the following
+                algorithms/code.
+                - Add to EXPANDED LinkedList.
+                - Delete from FRINGE LinkedList the array to be expanded.
+                - Insert to FRINGE LinkedList the children of the_arr[16] (passed in this function).
 
-    if(expandedLL_head == NULL) {
-        expandedLL_head = expanded_new_node;
-    } else {
-        expanded_iterator = expandedLL_head;
-        while(expanded_iterator -> next != NULL) {
-            expanded_iterator = expanded_iterator -> next;
-        }
-        expanded_iterator -> next = expanded_new_node;
-    }
+        TO CHECK:
+                1. Check the array passed exactly at this function, that is 'the_arr[16]'.
+                    - That is, check before starting this function, whether the_arr[16] that
+                    is passed within thin function already exists in the 'ExpandedLL'.
+                2. Check the arrays (child) when the_arr[16] is modified and expanded.
+                    - This means that the function passed within this function start_expanding
+                    was not found in the 'ExpandedLL' and is continued to be expanded.
+                    - Hence, it will produce its children.
+                    - Its children should be checked one by one, whether each already exists
+                    in the 'ExpandedLL'.
+                    - If the child already exists, then DO NOT ADD.
+                    - If the child does not exist, then ADD.
+    */
 
-    for(z = 0; z < 16; z++) {
-        expanded_new_node -> expanded_arr[z] = the_arr[z];
-    }
-    expanded_new_node -> next = NULL;
-    // ADDING - Add to EXPANDED LinkedList. [END]
+    if (check_ifAlready_inExpandedLL(the_arr) == 1) {   // Continue to add.
 
-    // DELETING - Free the node from the FRINGE LinkedList. [START]
-    struct FringeLL *fringe_iterator = fringeLL_head;
-    struct FringeLL *fringe_addressBefore_free = fringeLL_head;
-    struct FringeLL *fringe_adddressTo_free;
+        // ADDING - Add to EXPANDED LinkedList. [START]
+        struct ExpandedLL *expanded_new_node = (struct ExpandedLL *)malloc(sizeof(struct ExpandedLL));
+        struct ExpandedLL *expanded_iterator = expandedLL_head;
+        int z = 0;
+        what_level = what_level + 1;
 
-    if(fringeLL_head -> next == NULL) { // Means there is only one node, the ROOT (LEVEL 0).
-
-        fringe_adddressTo_free = fringeLL_head;
-        fringeLL_head = NULL;
-        free(fringe_adddressTo_free);
-
-    } else {                            // We need to search first where is the node to be deleted.
-
-        fringe_iterator = fringeLL_head;
-        while(fringe_iterator != NULL) {
-                
-            int x = 0;
-            int total = 0;
-            for(x = 0; x < 16; x++) {   // Loop will automatically end in 16 iterations.
-                if(fringe_iterator -> fringe_arr[x] == the_arr[x])
-                    total++;            // Will have a maximum value of 16.
-                else
-                    break;  // Means that the current array of the current node in the fringe is not what we want.
-            if(total == 16) // Means that all value of the array from this address equals the one to be expanded.
-                break;      // [1] Hence, we have found the address of the node in the fringe to delete.
-            }
-
-            fringe_addressBefore_free = fringe_iterator;    // If [1] is processed, this will not anymore run.
-            fringe_iterator = fringe_iterator -> next;      // If [1] is processed, this will not anymore run.
-        }
-
-        fringe_addressBefore_free -> next = fringe_iterator -> next;
-        fringe_adddressTo_free = fringe_iterator;
-        free(fringe_adddressTo_free);
-        // DELETING - Free the node from the FRINGE LinkedList. [END]
-
-    }
-
-    // EXPANSION/ADDING - Add to FRINGE LinkedList. [START]
-    int the_movement = 1;
-    int i = 0;
-
-    while(the_movement != 0 || i != 4) {    // i == 3 to stop the loop if movements total is 4.
-
-        /*
-        - Since we already know the index of negative one using index_of_negativeOne, we can use
-        this to exchange with the values of the_movement per iteration 'i' found at the_movements[i].
-
-        LOGIC:
-        - Per iteration, we can exchange the index of index_of_negativeOne with the_movement (which has value of
-        the_movements[i]) and a new array is formed.
-        - Note that the_arr[16] which is passed on the argument should not be changed value as it will be used
-        throughout this function.
-        - TODO:
-            1. Create a new array (new_arr[16]), where this array is passed the value of the_arr[16].
-            2. new_arr[16] will then be the one manipulated (exchange of index of -1 with the_movement).
-            3. Once index is exchanged, pass new_arr[16] to FRINGE using struct malloc.
-            4. LOOP '1.' until the_movement != 0 or i == 3 is true.
-        */
-
-        struct FringeLL *fringe_new_node = (struct FringeLL *)malloc(sizeof(struct FringeLL));
-        struct FringeLL *fringe_new_iterator = fringeLL_head;
-        int new_arr[16];
-        int p = 0;
-        int temp = 0;
-
-        // Pass value of the_arr to new_arr.
-        for(p = 0; p < 16; p++) {
-            new_arr[p] = the_arr[p];
-        }
-
-        // Exchange value.
-        the_movement = the_movements[i];                        // the_movement = 3
-        temp = new_arr[index_of_negativeOne];                   // temp         = new_arr[7]
-        new_arr[index_of_negativeOne] = new_arr[the_movement];  // new_arr[7]   = new_arr[3]
-        new_arr[the_movement] = temp;                           // new_arr[3]   = temp
-        // Now, the index has been exchanged.
-
-        // Insert to FRINGE LinkedList.
-        if(fringeLL_head == NULL) {
-            fringeLL_head = fringe_new_node;
+        if(expandedLL_head == NULL) {
+            expandedLL_head = expanded_new_node;
         } else {
-            fringe_new_iterator = fringeLL_head;
-            while(fringe_new_iterator -> next != NULL) {
-                fringe_new_iterator = fringe_new_iterator -> next;
+            expanded_iterator = expandedLL_head;
+            while(expanded_iterator -> next != NULL) {
+                expanded_iterator = expanded_iterator -> next;
             }
-            fringe_new_iterator -> next = fringe_new_node;
+            expanded_iterator -> next = expanded_new_node;
         }
 
-        fringe_new_node -> level = what_level;
-        for(p = 0; p < 16; p++) {
-            fringe_new_node -> fringe_arr[p] = new_arr[p];
+        for(z = 0; z < 16; z++) {
+            expanded_new_node -> expanded_arr[z] = the_arr[z];
         }
-        fringe_new_node -> next = NULL;
+        expanded_new_node -> next = NULL;
+        // ADDING - Add to EXPANDED LinkedList. [END]
 
-        i++;
+        // DELETING - Free the node from the FRINGE LinkedList. [START]
+        struct FringeLL *fringe_iterator = fringeLL_head;
+        struct FringeLL *fringe_addressBefore_free = fringeLL_head;
+        struct FringeLL *fringe_adddressTo_free;
+
+        if(fringeLL_head -> next == NULL) { // Means there is only one node, the ROOT (LEVEL 0).
+
+            fringe_adddressTo_free = fringeLL_head;
+            fringeLL_head = NULL;
+            free(fringe_adddressTo_free);
+
+        } else {                            // We need to search first where is the node to be deleted.
+
+            fringe_iterator = fringeLL_head;
+            while(fringe_iterator != NULL) {
+                    
+                int x = 0;
+                int total = 0;
+                for(x = 0; x < 16; x++) {   // Loop will automatically end in 16 iterations.
+                    if(fringe_iterator -> fringe_arr[x] == the_arr[x])
+                        total++;            // Will have a maximum value of 16.
+                    else
+                        break;  // Means that the current array of the current node in the fringe is not what we want.
+                if(total == 16) // Means that all value of the array from this address equals the one to be expanded.
+                    break;      // [1] Hence, we have found the address of the node in the fringe to delete.
+                }
+
+                fringe_addressBefore_free = fringe_iterator;    // If [1] is processed, this will not anymore run.
+                fringe_iterator = fringe_iterator -> next;      // If [1] is processed, this will not anymore run.
+            }
+
+            fringe_addressBefore_free -> next = fringe_iterator -> next;
+            fringe_adddressTo_free = fringe_iterator;
+            free(fringe_adddressTo_free);
+            // DELETING - Free the node from the FRINGE LinkedList. [END]
+
+        }
+
+        // EXPANSION/ADDING - Add to FRINGE LinkedList. [START]
+        int the_movement = 1;
+        int i = 0;
+
+        while(the_movement != 0 || i != 4) {    // i == 3 to stop the loop if movements total is 4.
+
+            /*
+            - Since we already know the index of negative one using index_of_negativeOne, we can use
+            this to exchange with the values of the_movement per iteration 'i' found at the_movements[i].
+
+            LOGIC:
+            - Per iteration, we can exchange the index of index_of_negativeOne with the_movement (which has value of
+            the_movements[i]) and a new array is formed.
+            - Note that the_arr[16] which is passed on the argument should not be changed value as it will be used
+            throughout this function.
+            - TODO:
+                1. Create a new array (new_arr[16]), where this array is passed the value of the_arr[16].
+                2. new_arr[16] will then be the one manipulated (exchange of index of -1 with the_movement).
+                3. Once index is exchanged, pass new_arr[16] to FRINGE using struct malloc.
+                4. LOOP '1.' until the_movement != 0 or i == 3 is true.
+            */
+
+            struct FringeLL *fringe_new_node = (struct FringeLL *)malloc(sizeof(struct FringeLL));
+            struct FringeLL *fringe_new_iterator = fringeLL_head;
+            int new_arr[16];
+            int p = 0;
+            int temp = 0;
+
+            // Pass value of the_arr to new_arr.
+            for(p = 0; p < 16; p++) {
+                new_arr[p] = the_arr[p];
+            }
+
+            // Exchange value.
+            the_movement = the_movements[i];                        // the_movement = 3
+            temp = new_arr[index_of_negativeOne];                   // temp         = new_arr[7]
+            new_arr[index_of_negativeOne] = new_arr[the_movement];  // new_arr[7]   = new_arr[3]
+            new_arr[the_movement] = temp;                           // new_arr[3]   = temp
+            // Now, the index has been exchanged.
+            // new_arr is the array to be inserted to the FRINGE LinkedList.
+
+            if (check_ifAlready_inExpandedLL(new_arr) == 1) {
+
+                // Insert to FRINGE LinkedList.
+                if(fringeLL_head == NULL) {
+                    fringeLL_head = fringe_new_node;
+                } else {
+                    fringe_new_iterator = fringeLL_head;
+                    while(fringe_new_iterator -> next != NULL) {
+                        fringe_new_iterator = fringe_new_iterator -> next;
+                    }
+                    fringe_new_iterator -> next = fringe_new_node;
+                }
+
+                fringe_new_node -> level = what_level;
+                for(p = 0; p < 16; p++) {
+                    fringe_new_node -> fringe_arr[p] = new_arr[p];
+                }
+                fringe_new_node -> next = NULL;
+
+            } // Else, do not add.
+
+            i++;
+        }
+        // EXPANSION/ADDING - Add to FRINGE LinkedList. [END]
+
+        // ADDING - Add to SOLUTIONPATH LinkedList. [START]
+        struct SolutionPathLL *new_node = (struct SolutionPathLL *)malloc(sizeof(struct SolutionPathLL));
+
+        // ADDING - Add to SOLUTIONPATH LinkedList. [END]
+
+    } // Else, do not add.
+
+}
+
+int check_ifAlready_inExpandedLL(int the_arr[16]) {
+
+    struct ExpandedLL *researcher = expandedLL_head;
+    int i = 0;
+    int cont = 1;
+
+    while(researcher != NULL) {
+
+        int total = 0;
+        // If total == 16, then that the_arr must not be inserted to FRINGE LL.
+        // Else, insert to FRINGE LL.
+        
+        for(i = 0; i < 16; i++) {
+            if(researcher -> expanded_arr[i] == the_arr[i])
+                total++;
+            else
+                break;
+        }
+
+        if(total == 16) {
+            cont = 0;
+            break;
+        }
+        researcher = researcher -> next;
+
     }
-    // EXPANSION/ADDING - Add to FRINGE LinkedList. [END]
 
-    // ADDING - Add to SOLUTIONPATH LinkedList. [START]
-    struct SolutionPathLL *new_node = (struct SolutionPathLL *)malloc(sizeof(struct SolutionPathLL));
-
-    // ADDING - Add to SOLUTIONPATH LinkedList. [END]
+    return cont;    // cont == 0, do not add to fringe. cont == 1, add to fringe.
 
 }
 
