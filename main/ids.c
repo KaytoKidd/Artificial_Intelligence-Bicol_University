@@ -21,7 +21,7 @@ struct ExpandedLL *expandedLL_head = NULL;
 struct FringeLL *fringeLL_head = NULL;
 struct SolutionPathLL *solutionPathLL_head = NULL;
 
-// GLOBAL DECLARATIONS (Array, Variables, etc.)
+// GLOBAL DECLARATIONS (Array, Variables, etc.) [START]
 struct SolutionPathLL *solutionPath_arr[4];    // Where the solution path will be inserted.
 /*  DOCUMENTATION FOR solutionPath_arr[4]
     How will it work?
@@ -42,6 +42,8 @@ struct SolutionPathLL *solutionPath_arr[4];    // Where the solution path will b
         - Where: Node1 = UP, Node2 = DOWN, Node3 = LEFT, node4 = RIGHT
         - If ULTIMATE PARENT (LEVEL 0) is expanded and found CHILDREN is only 2-3, then empty node will have value of 0.
 */
+int what_level = 0;
+// GLOBAL DECLARATIONS (Array, Variables, etc.) [END]
 
 // board_guide(), get_user_input(), and print_user_input() are all for user interaction only.
 // However, user_input[] will be used for the entire program.
@@ -110,7 +112,7 @@ void get_user_input(char board_guide_label[]) {
     }
 
     print_user_input(user_input);
-    insert_to_FringeLL(0, user_input); // First/Initial value of Fringe. Level = 0 (ROOT)
+    insert_to_FringeLL(what_level, user_input); // First/Initial value of Fringe. Level = 0 (ROOT)
 
 }
 
@@ -294,6 +296,7 @@ void start_expanding(int the_arr[16], int the_movements[4], int the_movements_la
     struct ExpandedLL *expanded_new_node = (struct ExpandedLL *)malloc(sizeof(struct ExpandedLL));
     struct ExpandedLL *expanded_iterator = expandedLL_head;
     int z = 0;
+    what_level = what_level + 1;
 
     if(expandedLL_head == NULL) {
         expandedLL_head = expanded_new_node;
@@ -353,10 +356,7 @@ void start_expanding(int the_arr[16], int the_movements[4], int the_movements_la
     int the_movement = 1;
     int i = 0;
 
-    while(the_movement != 0 || i == 3) {    // i == 3 to stop the loop if movements total is 4.
-
-        struct FringeLL *fringe_new_node = (struct FringeLL *)malloc(sizeof(struct FringeLL));
-        the_movement = the_movements[i];
+    while(the_movement != 0 || i != 4) {    // i == 3 to stop the loop if movements total is 4.
 
         /*
         - Since we already know the index of negative one using index_of_negativeOne, we can use
@@ -373,6 +373,41 @@ void start_expanding(int the_arr[16], int the_movements[4], int the_movements_la
             3. Once index is exchanged, pass new_arr[16] to FRINGE using struct malloc.
             4. LOOP '1.' until the_movement != 0 or i == 3 is true.
         */
+
+        struct FringeLL *fringe_new_node = (struct FringeLL *)malloc(sizeof(struct FringeLL));
+        struct FringeLL *fringe_new_iterator = fringeLL_head;
+        int new_arr[16];
+        int p = 0;
+        int temp = 0;
+
+        // Pass value of the_arr to new_arr.
+        for(p = 0; p < 16; p++) {
+            new_arr[p] = the_arr[p];
+        }
+
+        // Exchange value.
+        the_movement = the_movements[i];                        // the_movement = 3
+        temp = new_arr[index_of_negativeOne];                   // temp         = new_arr[7]
+        new_arr[index_of_negativeOne] = new_arr[the_movement];  // new_arr[7]   = new_arr[3]
+        new_arr[the_movement] = temp;                           // new_arr[3]   = temp
+        // Now, the index has been exchanged.
+
+        // Insert to FRINGE LinkedList.
+        if(fringeLL_head == NULL) {
+            fringeLL_head = fringe_new_node;
+        } else {
+            fringe_new_iterator = fringeLL_head;
+            while(fringe_new_iterator -> next != NULL) {
+                fringe_new_iterator = fringe_new_iterator -> next;
+            }
+            fringe_new_iterator -> next = fringe_new_node;
+        }
+
+        fringe_new_node -> level = what_level;
+        for(p = 0; p < 16; p++) {
+            fringe_new_node -> fringe_arr[p] = new_arr[p];
+        }
+        fringe_new_node -> next = NULL;
 
         i++;
     }
