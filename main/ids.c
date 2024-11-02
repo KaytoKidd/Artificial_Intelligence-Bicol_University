@@ -60,6 +60,7 @@ void find_which_to_expand();
 void expand_this(int deepestNode_index);
 void start_expanding(int the_arr[16], int the_movements[4], int the_movements_label[4], int index_of_negativeOne);
 int check_ifAlready_inExpandedLL(int the_arr[16]);
+int find_deepestNode_inFringe();
 
 void board_guide() {
 
@@ -383,6 +384,17 @@ void start_expanding(int the_arr[16], int the_movements[4], int the_movements_la
         int the_movement = 1;
         int i = 0;
 
+        // Get first total of non zero values in the_movements[4].
+        int a = 0;
+        int total_of_nonzero = 0;
+        int total_of_nonzero_checker = 0;
+
+        for(a = 0; a < 4; a++) {
+            if (the_movements[a] != 0) {
+                total_of_nonzero++;
+            }
+        }
+
         while(the_movement != 0 || i != 4) {    // i == 3 to stop the loop if movements total is 4.
 
             /*
@@ -439,9 +451,20 @@ void start_expanding(int the_arr[16], int the_movements[4], int the_movements_la
                 }
                 fringe_new_node -> next = NULL;
 
-            } // Else, do not add.
+            } else {
+                total_of_nonzero_checker++;
+                // This variable is used to count whether all cannot anymore be expanded.
+                // Hence, we can say that the parent does not anymore have a child.
+                // Therefore, we can set what_level to the highest level found within the fringe.
+            }
 
             i++;
+        }
+
+        if(total_of_nonzero == total_of_nonzero_checker) {
+            // It means that there is no node expanded.
+            // what_level = the next highest level in the FRINGE_LL.
+            what_level = find_deepestNode_inFringe();
         }
         // EXPANSION/ADDING - Add to FRINGE LinkedList. [END]
 
@@ -450,6 +473,8 @@ void start_expanding(int the_arr[16], int the_movements[4], int the_movements_la
 
         // ADDING - Add to SOLUTIONPATH LinkedList. [END]
 
+    } else {
+        what_level = find_deepestNode_inFringe();
     } // Else, do not add.
 
 }
@@ -485,6 +510,32 @@ int check_ifAlready_inExpandedLL(int the_arr[16]) {
 
 }
 
+int find_deepestNode_inFringe() {
+    struct FringeLL *finder = fringeLL_head;
+    int deepest_node = 0;
+
+    while(finder != NULL) {
+        if(deepest_node < finder -> level)
+            deepest_node = finder -> level;
+        finder = finder -> next;
+    }
+
+    return deepest_node;
+}
+
 void main() {
     board_guide();
 }
+
+/*  SPRINT BACKLOG - Week 2
+    [DONE] 1. Create an algorithm for level issue in FringeLL.
+        1.1.    It should not be fringe_new_node -> level = what_level; Where what_level is global.
+        Algorithm formed:
+            1.  Have an another index (new_index_checker) and check whether this index is equal to the current index.
+                - This new_index_checker is set the value of 0 whenever the condition "cannot anymore be expanded" is true.
+                - This means that new_index_checker is not set the value of 0 whenever the expanded not is not true to the condition above.
+                - This means that there will be no more children for the current level being expanded, and hence set the value of 0.
+    [DONE] 2. Create an algorithm for checking whether a certain node cannot anymore be expanded.
+            - This is where the SPRINT '1' is used.
+    3. Create an algorithm to check whether the node to be expanded is already the GOAL state.
+*/
