@@ -21,7 +21,13 @@ struct FringeLL *fringeLL_head = NULL;
 
 // Global Variables - Declaration
 int user_input_arr[16];
-int goalState_found = 0;
+int goal_state_arr[] = {
+    -1, 1, 2, 3,
+    4, 5, 6, 7,
+    8, 9, 10, 11,
+    12, 13, 14, 15
+};
+int goal_state_found = 0;
 
 // User Input - Declaration
 void board_guide();
@@ -33,9 +39,16 @@ void insert_to_FringeLL(int to_insert_level, int to_insert_arr[16]);
 void remove_from_FringeLL(int to_remove_arr[16]);
 void print_the_FringeLL();
 
+// Expanded - Definition
+void insert_to_ExpandedLL(int to_insert_arr[16]);
+
 // IDS Computation - Declaration
 void start_IDS(int iteration_level);
+void check_whether_GoalState(int to_check_arr[16]);
 void free_FringeLL_ExpandedLL_SolutionPathLL();
+
+// IDS Computation (When Goal is Found) - Declaration
+int count_total_nodes_in_ExpandedLL();
 
 // User Input - Definition
 void board_guide() {
@@ -216,35 +229,82 @@ void print_the_FringeLL() {
 }
 
 // Expanded - Definition
-void insert_to_ExpandedLL() {
+void insert_to_ExpandedLL(int to_insert_arr[16]) {
 
+    struct ExpandedLL *new_node = (struct ExpandedLL *)malloc(sizeof(struct ExpandedLL));
+    struct ExpandedLL *iterator = expandedLL_head;
+    int i = 0;
 
+    if(expandedLL_head == NULL) {
+        expandedLL_head = new_node;
+    } else {
+        iterator = expandedLL_head;
+        while(iterator -> next != NULL) {
+            iterator = iterator -> next;
+        }
+        iterator -> next = new_node;
+    }
+
+    for(i = 0; i < 16; i++) {
+        new_node -> expandedLL_arr[i] = to_insert_arr[i];
+    }
+    new_node -> next = NULL;
 
 }
 
 // IDS Computation - Definition
 void start_IDS(int iteration_level) {
 
-    /*
-        NOTE:
-        - current_iteration_level increments by 1.
-        - Once current_iteration_level == iteration_level, if no more to expand using DFS,
-          then STOP.
-        - Once STOP, go back to main, and iterate again (iteration_level++;).
-    */
-    int current_iteration_level = 0;
-
     if(iteration_level == 0) {
+
         /*
             Process:
                 1. Add to ExpandedLL
-                2. Remove from FringeLL
-                3. Check whether the Goal State.
-                    3.1. If Goal State = End program, show solution path.
-                    3.2. If Not Goal State = Skip/Break this and continue with next iteration.
+                2. Check whether the Goal State.
+                    2.1. If Goal State = End program, show solution path.
+                    2.2. If Not Goal State = Skip/Break this and continue with next iteration.
+            Note:
+            - We do not have to anymore include to the FringeLL then remove it again.
+            - Instead, we can just add it to the ExpandedLL, then check already if Goal State.
+            - For iteration_level >= 1, we need to insert first to the Fringe the user_input_arr[].
         */
-        //
+
+        insert_to_ExpandedLL(user_input_arr);
+        check_whether_GoalState(user_input_arr);
+
+    } else {
+
+        /*
+            NOTE:
+            - current_iteration_level increments by 1.
+            - Once current_iteration_level == iteration_level, if no more to expand using DFS,
+            then STOP.
+            - Once STOP, go back to main, and iterate again (iteration_level++;).
+        */
+        int current_iteration_level = 0;
+
+        insert_to_FringeLL(0, user_input_arr);
+
     }
+
+}
+
+void check_whether_GoalState(int to_check_arr[16]) {
+
+    int i = 0;
+    int is_goal_state = 0;
+    
+    for(i = 0; i < 16; i++) {
+
+        if(to_check_arr[i] == goal_state_arr[i])
+            is_goal_state++;
+        else
+            break;
+
+    }
+
+    if(is_goal_state == 16)
+        goal_state_found = 1;
 
 }
 
@@ -280,6 +340,21 @@ void free_FringeLL_ExpandedLL_SolutionPathLL() {
 
 }
 
+// IDS Computation (When Goal is Found) - Definition
+int count_total_nodes_in_ExpandedLL() {
+
+    struct ExpandedLL *total_counter = expandedLL_head;
+    int total_count = 0;
+
+    while(total_counter != NULL) {
+        total_count++;
+        total_counter = total_counter -> next;
+    }
+
+    return total_count;
+
+}
+
 void main() {
 
     board_guide();      // Show Guide Table
@@ -288,10 +363,40 @@ void main() {
     // Start IDS Algorithm
     int iteration_level = 0;
 
-    while(goalState_found == 0) {   // 0 = false (not found), 1 = true (found, end program)
+    while(goal_state_found == 0) {  // 0 = false (not found, continue), 1 = true (found, end program)
         start_IDS(iteration_level);
+
+        if(goal_state_found != 0)   // 1 = Goal State Found.
+            break;
+        
+        // The following code below will not be run when the if statement above is true.
         free_FringeLL_ExpandedLL_SolutionPathLL();
         iteration_level++;
     }
+
+    /*
+        Insert the code below for when the Goal State is achieved.
+    
+        Process:
+            1. Show Solution Path
+                - Must show the movement label.
+                - Example: UP -> DOWN -> DOWN -> RIGHT -> ...
+            2. Show Solution Cost
+                - The number of moves required to reach the goal state.
+            3. Show Search Cost
+                - This is the number of nodes expanded before finding the solution.
+                - The answer for this is the total count of nodes in the ExpandedLL.
+            4. Show Running Time
+                - Help.
+    */
+
+   printf("\n");
+   printf("Nahanap rin sa wakas goal state.\n");
+   printf("Nag wowork pa lang so far, pag yung mismong input is Goal State na.\n\n");
+   
+   printf("[SOLUTION PATH] = \n");
+   printf("[SOLUTION COST] = \n");
+   printf("[SOLUTION SEARCH COST] = %d\n", count_total_nodes_in_ExpandedLL());
+   printf("[RUNNING TIME] = \n");
     
 }
