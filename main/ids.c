@@ -19,6 +19,10 @@ struct FringeLL {
 struct ExpandedLL *expandedLL_head = NULL;
 struct FringeLL *fringeLL_head = NULL;
 
+// Global Variables - Declaration
+int user_input_arr[16];
+int goalState_found = 0;
+
 // User Input - Declaration
 void board_guide();
 void get_user_input();
@@ -27,6 +31,10 @@ void print_userInput_in_boardGuide(int user_input[16]);
 // Fringe - Declaration
 void insert_to_FringeLL(int to_insert_level, int to_insert_arr[16]);
 void print_the_FringeLL();
+
+// IDS Computation - Declaration
+void start_IDS(int iteration_level);
+void free_FringeLL_ExpandedLL_SolutionPathLL();
 
 // User Input - Definition
 void board_guide() {
@@ -67,7 +75,6 @@ void get_user_input() {
         'i', 'j', 'k', 'l',
         'm', 'n', 'o', 'p'
     };
-    int user_input_arr[16];
     int i = 0;
 
     for(i = 0; i < 16; i++) {
@@ -78,7 +85,7 @@ void get_user_input() {
     }
 
     print_userInput_in_boardGuide(user_input_arr);
-    insert_to_FringeLL(0, user_input_arr);  // 0 = Level 0, ROOT.
+    // insert_to_FringeLL(0, user_input_arr);  // 0 = Level 0, ROOT.
 
 }
 
@@ -171,9 +178,59 @@ void print_the_FringeLL() {
 
 }
 
+// IDS Computation - Definition
+void start_IDS(int iteration_level) {
+
+    if(iteration_level == 0) {
+
+    }
+
+}
+
+void free_FringeLL_ExpandedLL_SolutionPathLL() {
+
+    // The purpose of this function is to delete the entire Fringe and Expanded LinkedList.
+    // This is done per iteration level, following IDS rules on iteration.
+
+    // ExpandedLL
+    struct ExpandedLL *expandedLL_freer = expandedLL_head;
+
+    while(expandedLL_head != NULL) {
+        expandedLL_freer = expandedLL_head;
+        expandedLL_head = expandedLL_head -> next;
+        free(expandedLL_freer);
+    }
+
+    expandedLL_head = NULL;
+
+    // FringeLL
+    struct FringeLL *fringeLL_freer = fringeLL_head;
+
+    while(fringeLL_head != NULL) {
+        fringeLL_freer = fringeLL_head;
+        fringeLL_head = fringeLL_head -> next;
+        free(fringeLL_freer);
+    }
+
+    fringeLL_head = NULL;
+
+    // SolutionPathLL
+    // Add code here later.
+
+}
+
 void main() {
 
     board_guide();      // Show Guide Table
     get_user_input();   // Get User Input
+
+    // Start IDS Algorithm
+    int iteration_level = 0;
+
+    while(goalState_found == 0) {   // 0 = false (not found), 1 = true (found, end program)
+        start_IDS(iteration_level);
+        free_FringeLL_ExpandedLL_SolutionPathLL();
+        iteration_level++;
+    }
     
 }
