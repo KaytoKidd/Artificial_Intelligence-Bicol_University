@@ -19,16 +19,15 @@ struct SolutionPathLL {
 
 struct ExpandedLL *expandedLL_head = NULL;
 struct FringeLL *fringeLL_head = NULL;
-struct SolutionPathLL *solutionPathLL_head = NULL;
 
 // GLOBAL DECLARATIONS (Array, Variables, etc.) [START]
-struct SolutionPathLL *solutionPath_arr[4];    // Where the solution path will be inserted.
-/*  DOCUMENTATION FOR solutionPath_arr[4]
+struct SolutionPathLL *solutionPathLL_head_arr[4];    // Where the solution path will be inserted.
+/*  DOCUMENTATION FOR solutionPathLL_head_arr[4]
     How will it work?
-        - Each index of the solutionPath_arr will contain the head of the LinkedList.
+        - Each index of the solutionPathLL_head_arr will contain the head of the LinkedList.
         - Example: 
-            solutionPath_arr[0] = #00001 (the address of the first node in the LinkedList)
-            solutionPath_arr[0] = #00002 (the address of the second node in the LinkedList)
+            solutionPathLL_head_arr[0] = #00001 (the address of the first node in the LinkedList)
+            solutionPathLL_head_arr[0] = #00002 (the address of the second node in the LinkedList)
             and so on.
     What are these four(4)?
         - These are the CHILD of the ROOT.
@@ -43,6 +42,7 @@ struct SolutionPathLL *solutionPath_arr[4];    // Where the solution path will b
         - If ULTIMATE PARENT (LEVEL 0) is expanded and found CHILDREN is only 2-3, then empty node will have value of 0.
 */
 int what_level = 0;
+int program_initialStart = 0;
 
 int goal_state[16] = {
     -1, 1, 2, 3,
@@ -65,6 +65,7 @@ void insert_to_FringeLL(int the_level, int the_arr[16]);
 void print_FringeLL(); // Debugging purposes, DELETE LATER.
 void find_which_to_expand();
 void expand_this(int deepestNode_index);
+void initialize_SolutionPathLL(int the_arr[4]); // Inserting Array for initial Solution Path (Only called once.)
 void start_expanding(int the_arr[16], int the_movements[4], int the_movements_label[4], int index_of_negativeOne);
 int check_ifAlready_inExpandedLL(int the_arr[16]);
 int find_deepestNode_inFringe();
@@ -299,7 +300,47 @@ void expand_this(int deepestNode_level) {
         movements_label_arr[z] = movements[x][y + 1][z];    // Example: 96,97,98,99
     }
 
+    if(program_initialStart == 0) {
+        initialize_SolutionPathLL(movements_label_arr);
+        // Values of SolutionPathLL is the movements (96, 97, 98, 99).
+    }
+    program_initialStart = 1;   // Makes the code above not anymore work.
+                                // Note that the if statement above is only called once (to initialize Solution Path).
+
     start_expanding(to_expand_arr, movements_index_arr, movements_label_arr, index_of_negativeOne);
+
+}
+
+void initialize_SolutionPathLL(int the_arr[4]) {
+
+    int i = 0;
+    int movement_label = 1;
+
+    while(movement_label != 0 || i != 4) {
+
+        movement_label = the_arr[i];
+        struct SolutionPathLL *new_node = (struct SolutionPathLL *)malloc(sizeof(struct SolutionPathLL));
+
+        solutionPathLL_head_arr[i] = new_node;
+        new_node -> movement = movement_label;
+        new_node -> next = NULL;
+        i++;
+
+    }
+
+    /*
+        - There is a huge possibility that some head will still contain NULL.
+        - For example:
+            solutionPathLL_head_arr[0] = #1000
+            solutionPathLL_head_arr[1] = #2000
+            solutionPathLL_head_arr[2] = NULL
+            solutionPathLL_head_arr[3] = NULL
+        - #1000 is an imaginary address.
+        - This is because while loop ended on the 2nd iteration (the_arr[4] contains {96, 97, 0, 0})
+        - Where, when encountered a in the_arr[0], it ended the loop.
+        - We will just add a condition so that this will work.
+        - We can use 'NULL' to end the program as well.
+    */
 
 }
 
@@ -489,6 +530,12 @@ void start_expanding(int the_arr[16], int the_movements[4], int the_movements_la
     } else {
         what_level = find_deepestNode_inFringe();
     } // Else, do not add.
+
+}
+
+void insert_to_SolutionPathLL() {
+
+    //hmm, just a sec.
 
 }
 
