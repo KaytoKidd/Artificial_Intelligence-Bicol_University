@@ -30,6 +30,7 @@ void print_userInput_in_boardGuide(int user_input[16]);
 
 // Fringe - Declaration
 void insert_to_FringeLL(int to_insert_level, int to_insert_arr[16]);
+void remove_from_FringeLL(int to_remove_arr[16]);
 void print_the_FringeLL();
 
 // IDS Computation - Declaration
@@ -159,6 +160,42 @@ void insert_to_FringeLL(int to_insert_level, int to_insert_arr[16]) {
 
 }
 
+void remove_from_FringeLL(int to_remove_arr[16]) {
+
+    struct FringeLL *connector = fringeLL_head;
+    struct FringeLL *deleter = fringeLL_head;
+    int in_the_beginning = 0;
+
+    while(deleter != NULL) {
+
+        int all_the_same = 0;
+        int i = 0;
+
+        for(i = 0; i < 16; i++) {
+            if(deleter -> fringeLL_arr[i] == to_remove_arr[i])
+                all_the_same++; // If all_the_same == 16, means array is same as to_remove_arr[16].
+            else
+                break;          // Current array is not the same with to_remove_arr[16]
+        }
+
+        if(all_the_same == 16)  // We want to end, so that 'deleter' will have the address of what to delete.
+            break;
+
+        in_the_beginning++;
+        connector = deleter;
+        deleter = deleter -> next;
+
+    }
+
+    if(in_the_beginning == 0)
+        fringeLL_head = fringeLL_head -> next;
+    else
+        connector -> next = deleter -> next;
+
+    free(deleter);
+
+}
+
 void print_the_FringeLL() {
 
     printf("\n[THE FRINGE :D]\n");
@@ -178,11 +215,35 @@ void print_the_FringeLL() {
 
 }
 
+// Expanded - Definition
+void insert_to_ExpandedLL() {
+
+
+
+}
+
 // IDS Computation - Definition
 void start_IDS(int iteration_level) {
 
-    if(iteration_level == 0) {
+    /*
+        NOTE:
+        - current_iteration_level increments by 1.
+        - Once current_iteration_level == iteration_level, if no more to expand using DFS,
+          then STOP.
+        - Once STOP, go back to main, and iterate again (iteration_level++;).
+    */
+    int current_iteration_level = 0;
 
+    if(iteration_level == 0) {
+        /*
+            Process:
+                1. Add to ExpandedLL
+                2. Remove from FringeLL
+                3. Check whether the Goal State.
+                    3.1. If Goal State = End program, show solution path.
+                    3.2. If Not Goal State = Skip/Break this and continue with next iteration.
+        */
+        //
     }
 
 }
