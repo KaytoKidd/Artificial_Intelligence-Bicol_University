@@ -68,9 +68,9 @@ void check_whether_GoalState(int to_check_arr[16]);
 void free_FringeLL_ExpandedLL_SolutionPathLL();
 void find_which_to_expand();
 void start_IDS_Expansion();
+void levelRestarted_restartAllGlobalVariable();
 
 // Solution Path - Declaration
-void initial_solution_path();
 
 // IDS Computation (When Goal is Found) - Declaration
 void todo_when_IDSGoalState_found();
@@ -528,15 +528,56 @@ void start_IDS_Expansion() {
 
     // Solution Path
     i = 0;
-    if(initial_solutionpath_insertion == 1) {   // True, it is the initial insertion of solution path.
+    if(initial_solutionpath_insertion == 1 && iteration_level >= 1) {   // True, it is the initial insertion of solution path.
 
         while(movements_label_arr[i] != 0 || i != 4) {
 
+            struct SolutionPathLL *new_node = (struct SolutionPathLL *)malloc(sizeof(struct SolutionPathLL));
+            struct SolutionPathLL *iterator;
+
+            if(solutionPathLL_head[i] == NULL) {
+                solutionPathLL_head[i] = new_node;
+            } else {
+                iterator = solutionPathLL_head[i];
+                while(iterator -> next != NULL) {
+                    iterator = iterator -> next;
+                }
+                iterator -> next = new_node;
+            }
+
+            new_node -> movement = movements_label_arr[i];
+            new_node -> next = NULL;
+            
         }
+
+        initial_solutionpath_insertion = 0;
+        // Once the above code is done, this will not anymore be accessed until the end.
+        // However, once per level on the while loop on main() is processed, this will be processed once again.
+        // Note: This only works if Level is >= 1.
+        // Note: When Level 0, it will not do anything.
 
     } else {    // False, not the initial insertion for solution path.
 
     }
+
+}
+
+void levelRestarted_restartAllGlobalVariable() {
+
+    goal_state_found = 0;
+
+    // to_expand_arr[16];
+    int i = 0;
+    for(i = 0; i < 16; i++) {
+        to_expand_arr[i] = 0;
+    }
+
+    to_expand_arr_level = 0;
+    index_of_negative_one = 0;
+    iteration_level = 0;
+    fringe_is_empty = 0;
+
+    initial_solutionpath_insertion = 1;
 
 }
 
@@ -596,6 +637,7 @@ void main() {
         
         // The following code below will not be run when the if statement above is true.
         free_FringeLL_ExpandedLL_SolutionPathLL();
+        levelRestarted_restartAllGlobalVariable();
         iteration_level++;
     }
     
