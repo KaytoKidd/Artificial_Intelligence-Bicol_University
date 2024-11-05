@@ -29,6 +29,10 @@ int goal_state_arr[] = {
 };
 int goal_state_found = 0;
 
+int to_expand_arr[16];
+int to_expand_arr_level = 0;
+int iteration_level = 0;
+
 // User Input - Declaration
 void board_guide();
 void get_user_input();
@@ -44,8 +48,10 @@ void insert_to_ExpandedLL(int to_insert_arr[16]);
 
 // IDS Computation - Declaration
 void start_IDS(int iteration_level);
+void check_if_possible_to_expand();
 void check_whether_GoalState(int to_check_arr[16]);
 void free_FringeLL_ExpandedLL_SolutionPathLL();
+void find_which_to_expand();
 
 // IDS Computation (When Goal is Found) - Declaration
 int count_total_nodes_in_ExpandedLL();
@@ -255,35 +261,21 @@ void insert_to_ExpandedLL(int to_insert_arr[16]) {
 // IDS Computation - Definition
 void start_IDS(int iteration_level) {
 
-    if(iteration_level == 0) {
+    remove_from_FringeLL(to_expand_arr);
+    insert_to_ExpandedLL(to_expand_arr);
+    check_whether_GoalState(to_expand_arr);
 
-        /*
-            Process:
-                1. Add to ExpandedLL
-                2. Check whether the Goal State.
-                    2.1. If Goal State = End program, show solution path.
-                    2.2. If Not Goal State = Skip/Break this and continue with next iteration.
-            Note:
-            - We do not have to anymore include to the FringeLL then remove it again.
-            - Instead, we can just add it to the ExpandedLL, then check already if Goal State.
-            - For iteration_level >= 1, we need to insert first to the Fringe the user_input_arr[].
-        */
-
-        insert_to_ExpandedLL(user_input_arr);
-        check_whether_GoalState(user_input_arr);
-
+    if(goal_state_found == 1) {
+        // End Program.
     } else {
+        // Continue.
+    }
 
-        /*
-            NOTE:
-            - current_iteration_level increments by 1.
-            - Once current_iteration_level == iteration_level, if no more to expand using DFS,
-            then STOP.
-            - Once STOP, go back to main, and iterate again (iteration_level++;).
-        */
-        int current_iteration_level = 0;
+}
 
-        insert_to_FringeLL(0, user_input_arr);
+void check_if_possible_to_expand() {
+
+    if(to_expand_arr_level == iteration_level) {
 
     }
 
@@ -340,6 +332,47 @@ void free_FringeLL_ExpandedLL_SolutionPathLL() {
 
 }
 
+void find_which_to_expand() {
+
+    struct FringeLL *finder = fringeLL_head;
+    int deepest_node = 0;
+    int i = 0;
+    int index_of_negative_one = 0;
+
+    // Getting the deepest level from the FringeLL.
+    finder = fringeLL_head;
+    while(finder != NULL) {
+        if(deepest_node < finder -> level)
+            deepest_node = finder -> level;
+        finder = finder -> next;
+    }
+
+    // Finding which node/array from the FringeLL is to be expanded.
+    finder = fringeLL_head;
+    while(finder != NULL) {
+        if(finder -> level == deepest_node)
+            break;  // Now, 'finder' will have the address of the node/array that we want to expand.
+        finder = finder -> next;
+    }
+
+    // Inserting the level of the to_expand_arr[16] to the global variable to_expand_arr_level.
+    to_expand_arr_level = finder -> level;
+
+    // Inserting array from FringeLL to the global array to_expand_arr[16].
+    for(i = 0; i < 16; i++) {
+        to_expand_arr[i] = finder -> fringeLL_arr[i];
+    }
+
+    // Finding the index of negative one(-1) in the array to be expanded.
+    for(i = 0; i < 16; i++) {
+        if(to_expand_arr[i] == -1) {
+            index_of_negative_one = i;
+            break;
+        }
+    }
+    
+}
+
 // IDS Computation (When Goal is Found) - Definition
 int count_total_nodes_in_ExpandedLL() {
 
@@ -361,8 +394,6 @@ void main() {
     get_user_input();   // Get User Input
 
     // Start IDS Algorithm
-    int iteration_level = 0;
-
     while(goal_state_found == 0) {  // 0 = false (not found, continue), 1 = true (found, end program)
         start_IDS(iteration_level);
 
