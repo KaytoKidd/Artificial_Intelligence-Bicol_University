@@ -16,8 +16,16 @@ struct FringeLL {
 
 };
 
+struct SolutionPathLL {
+
+    int movement;
+    struct SolutionPathLL *next;
+
+};
+
 struct ExpandedLL *expandedLL_head = NULL;
 struct FringeLL *fringeLL_head = NULL;
+struct SolutionPathLL *solutionPathLL_head[4];
 
 // Global Variables - Declaration
 int user_input_arr[16];
@@ -36,6 +44,9 @@ int index_of_negative_one = 0;
 int iteration_level = 0;
 int fringe_is_empty = 0;
 
+// Global Variables - Declaration (Used for Solution Path)
+int initial_solutionpath_insertion = 1;  // 1 = true, 0 = false
+
 // User Input - Declaration
 void board_guide();
 void get_user_input();
@@ -46,7 +57,7 @@ void insert_to_FringeLL(int to_insert_level, int to_insert_arr[16]);
 void remove_from_FringeLL(int to_remove_arr[16]);
 void print_the_FringeLL();
 
-// Expanded - Definition
+// Expanded - Declaration
 void insert_to_ExpandedLL(int to_insert_arr[16]);
 int check_if_already_in_ExpandedLL(int to_check_arr[16]);
 
@@ -57,6 +68,9 @@ void check_whether_GoalState(int to_check_arr[16]);
 void free_FringeLL_ExpandedLL_SolutionPathLL();
 void find_which_to_expand();
 void start_IDS_Expansion();
+
+// Solution Path - Declaration
+void initial_solution_path();
 
 // IDS Computation (When Goal is Found) - Declaration
 void todo_when_IDSGoalState_found();
@@ -484,8 +498,10 @@ void start_IDS_Expansion() {
                   children depends on the parent.
     */
 
-    // Exchange index.
     int i = 0;
+
+    // Exchange Index
+    i = 0;
     while(movements_index_arr[i] != 0 || i != 4) {
 
         // Copy to_expand_arr to temp_expand_arr.
@@ -506,9 +522,21 @@ void start_IDS_Expansion() {
 
         }
 
+        i++;
+
     }
 
+    // Solution Path
+    i = 0;
+    if(initial_solutionpath_insertion == 1) {   // True, it is the initial insertion of solution path.
 
+        while(movements_label_arr[i] != 0 || i != 4) {
+
+        }
+
+    } else {    // False, not the initial insertion for solution path.
+
+    }
 
 }
 
