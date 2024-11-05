@@ -48,6 +48,7 @@ void print_the_FringeLL();
 
 // Expanded - Definition
 void insert_to_ExpandedLL(int to_insert_arr[16]);
+int check_if_already_in_ExpandedLL(int to_check_arr[16]);
 
 // IDS Computation - Declaration
 void start_IDS();
@@ -263,6 +264,34 @@ void insert_to_ExpandedLL(int to_insert_arr[16]) {
 
 }
 
+int check_if_already_in_ExpandedLL(int to_check_arr[16]) {
+
+    struct ExpandedLL *checker = expandedLL_head;
+    int already_in_expanded = 0;    // 0 = false, 1 = true
+    int total_counter = 0;
+    int i = 0;
+
+    while(checker != NULL) {
+
+        for(i = 0; i < 16; i++){
+            if(to_check_arr[i] == checker -> expandedLL_arr[i])
+                total_counter++;
+            else
+                break;
+        }
+        checker = checker -> next;
+
+        if(total_counter == 16) {
+            already_in_expanded = 1;
+            break;
+        }
+
+    }
+
+    return already_in_expanded;
+
+}
+
 // IDS Computation - Definition
 void start_IDS() {
 
@@ -445,6 +474,41 @@ void start_IDS_Expansion() {
         movements_index_arr[z] = movements[x][y][z];        // Example: 3,11,6,8
         movements_label_arr[z] = movements[x][y + 1][z];    // Example: 96,97,98,99
     }
+
+    /*  EXCHANGING INDEX
+        Process:
+            1. Copy to_expand_arr to temp_expand_arr.
+                - This is to not change the value of to_expand_arr, since
+                  it may be used again for other movements later.
+                - This is because to_expand_arr is the parent, and the
+                  children depends on the parent.
+    */
+
+    // Exchange index.
+    int i = 0;
+    while(movements_index_arr[i] != 0 || i != 4) {
+
+        // Copy to_expand_arr to temp_expand_arr.
+        int temp_expand_arr[16];
+        int j = 0;
+
+        for(j = 0; j < 16; j++) {
+            temp_expand_arr[j] = to_expand_arr[j];
+        }
+
+        int temp = temp_expand_arr[index_of_negative_one];
+        temp_expand_arr[index_of_negative_one] = temp_expand_arr[movements_index_arr[i]];
+        temp_expand_arr[movements_index_arr[i]] = temp;
+
+        if(check_if_already_in_ExpandedLL(temp_expand_arr) == 0) {  // Not yet in the ExpandedLL.
+
+            insert_to_FringeLL(to_expand_arr_level + 1, temp_expand_arr);
+
+        }
+
+    }
+
+
 
 }
 
