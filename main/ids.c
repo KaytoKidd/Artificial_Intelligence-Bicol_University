@@ -29,9 +29,12 @@ int goal_state_arr[] = {
 };
 int goal_state_found = 0;
 
+// Global Variables - Declaration (Used for find_which_to_expand())
 int to_expand_arr[16];
 int to_expand_arr_level = 0;
+int index_of_negative_one = 0;
 int iteration_level = 0;
+int fringe_is_empty = 0;
 
 // User Input - Declaration
 void board_guide();
@@ -55,6 +58,7 @@ void find_which_to_expand();
 void start_IDS_Expansion();
 
 // IDS Computation (When Goal is Found) - Declaration
+void todo_when_IDSGoalState_found();
 int count_total_nodes_in_ExpandedLL();
 
 // User Input - Definition
@@ -262,20 +266,28 @@ void insert_to_ExpandedLL(int to_insert_arr[16]) {
 // IDS Computation - Definition
 void start_IDS() {
 
+    perform_this:
     remove_from_FringeLL(to_expand_arr);
     insert_to_ExpandedLL(to_expand_arr);
     check_whether_GoalState(to_expand_arr);
 
     if(goal_state_found == 1) {
-        // End Program.
+
+        todo_when_IDSGoalState_found();
+
     } else {
+
         if(check_if_possible_to_expand() == 1) {    // Possible to expand
-            // Continue Process 3
+            
             start_IDS_Expansion();
+
         } else {    // Not possible to expand.
-            // Jump to Process 5
+
             find_which_to_expand();
+            if(fringe_is_empty == 0) // Fringe is not empty. We will continue
+                goto perform_this;
         }
+
     }
 
 }
@@ -349,56 +361,121 @@ void find_which_to_expand() {
     struct FringeLL *finder = fringeLL_head;
     int deepest_node = 0;
     int i = 0;
-    int index_of_negative_one = 0;
 
     // Condition - For when the fringe is now empty.
     if(fringeLL_head == NULL) {
+
         // The fringe is empty, nothing anymore to expand.
         // This happens when on the certain level, the goal state is not found.
-    }
-
-
-    // Getting the deepest level from the FringeLL.
-    finder = fringeLL_head;
-    while(finder != NULL) {
-        if(deepest_node < finder -> level)
-            deepest_node = finder -> level;
-        finder = finder -> next;
-    }
-
-    // Finding which array from the FringeLL is to be expanded.
-    finder = fringeLL_head;
-    while(finder != NULL) {
-        if(finder -> level == deepest_node)
-            break;  // Now, 'finder' will have the address of the node/array that we want to expand.
-        finder = finder -> next;
-    }
-
-    // Inserting the level of the to_expand_arr[16] to the global variable to_expand_arr_level.
-    to_expand_arr_level = finder -> level;
-
-    // Inserting array from FringeLL to the global array to_expand_arr[16].
-    for(i = 0; i < 16; i++) {
-        to_expand_arr[i] = finder -> fringeLL_arr[i];
-    }
-
-    // Finding the index of negative one(-1) in the array to be expanded.
-    for(i = 0; i < 16; i++) {
-        if(to_expand_arr[i] == -1) {
-            index_of_negative_one = i;
-            break;
-        }
-    }
+        fringe_is_empty = 1;    // True, fringe is empty.
     
+    } else {
+
+        // Getting the deepest level from the FringeLL.
+        finder = fringeLL_head;
+        while(finder != NULL) {
+            if(deepest_node < finder -> level)
+                deepest_node = finder -> level;
+            finder = finder -> next;
+        }
+
+        // Finding which array from the FringeLL is to be expanded.
+        finder = fringeLL_head;
+        while(finder != NULL) {
+            if(finder -> level == deepest_node)
+                break;  // Now, 'finder' will have the address of the node/array that we want to expand.
+            finder = finder -> next;
+        }
+
+        // Inserting the level of the to_expand_arr[16] to the global variable to_expand_arr_level.
+        to_expand_arr_level = finder -> level;
+
+        // Inserting array from FringeLL to the global array to_expand_arr[16].
+        for(i = 0; i < 16; i++) {
+            to_expand_arr[i] = finder -> fringeLL_arr[i];
+        }
+
+        // Finding the index of negative one(-1) in the array to be expanded.
+        for(i = 0; i < 16; i++) {
+            if(to_expand_arr[i] == -1) {
+                index_of_negative_one = i;
+                break;
+            }
+        }
+        
+
+    }
+
 }
 
 void start_IDS_Expansion() {
 
+    // Hierarchy of Priority: UP -> DOWN -> LEFT -> RIGHT
+    // UP       - 96
+    // DOWN     - 97
+    // LEFT     - 98
+    // RIGHT    - 99
+    int movements_index_arr[4];
+    int movements_label_arr[4];
 
+    int movements[16][3][4] = {
+        {{1}, {5, 2}, {96, 99}},                    // 0
+        {{2}, {6, 1, 3}, {97, 98, 99}},             // 1
+        {{3}, {7, 2, 40}, {97, 98, 99}},            // 2
+        {{4}, {8, 3}, {97, 98}},                    // 3
+        {{5}, {1, 9, 6}, {96, 97, 99}},             // 4
+        {{6}, {2, 10, 5, 7}, {96, 97, 98, 99}},     // 5
+        {{7}, {3, 11, 6, 8}, {96, 97, 98, 99}},     // 6
+        {{8}, {4, 12, 7}, {96, 97, 98}},            // 7
+        {{9}, {5, 13, 10}, {96, 97, 99}},           // 8
+        {{10}, {6, 14, 9, 11}, {96, 97, 98, 99}},   // 9
+        {{11}, {7, 15, 10, 12}, {96, 97, 98, 99}},  // 10
+        {{12}, {8, 16, 11}, {96, 97, 98}},          // 11
+        {{13}, {9, 14}, {96, 99}},                  // 12
+        {{14}, {10, 13, 15}, {96, 98, 99}},         // 13
+        {{15}, {11, 14, 16}, {96, 98, 99}},         // 14
+        {{16}, {12, 15}, {96, 98}}                  // 15
+    };
+
+    int x = index_of_negative_one;
+    int y = 1;
+    int z = 0;
+
+    for(z = 0; z < 4; z++){ 
+        movements_index_arr[z] = movements[x][y][z];        // Example: 3,11,6,8
+        movements_label_arr[z] = movements[x][y + 1][z];    // Example: 96,97,98,99
+    }
 
 }
 
 // IDS Computation (When Goal is Found) - Definition
+void todo_when_IDSGoalState_found() {
+
+    /*
+        Insert the code below for when the Goal State is achieved.
+    
+        Process:
+            1. Show Solution Path
+                - Must show the movement label.
+                - Example: UP -> DOWN -> DOWN -> RIGHT -> ...
+            2. Show Solution Cost
+                - The number of moves required to reach the goal state.
+            3. Show Search Cost
+                - This is the number of nodes expanded before finding the solution.
+                - The answer for this is the total count of nodes in the ExpandedLL.
+            4. Show Running Time
+                - Help.
+    */
+
+    int solution_search_cost = count_total_nodes_in_ExpandedLL();
+
+    printf("[SOLUTION PATH] = \n");
+    printf("[SOLUTION COST] = \n");
+    printf("[SOLUTION SEARCH COST] = %d\n", solution_search_cost);
+    printf("[RUNNING TIME] = \n");
+
+}
+
 int count_total_nodes_in_ExpandedLL() {
 
     struct ExpandedLL *total_counter = expandedLL_head;
@@ -429,30 +506,5 @@ void main() {
         free_FringeLL_ExpandedLL_SolutionPathLL();
         iteration_level++;
     }
-
-    /*
-        Insert the code below for when the Goal State is achieved.
-    
-        Process:
-            1. Show Solution Path
-                - Must show the movement label.
-                - Example: UP -> DOWN -> DOWN -> RIGHT -> ...
-            2. Show Solution Cost
-                - The number of moves required to reach the goal state.
-            3. Show Search Cost
-                - This is the number of nodes expanded before finding the solution.
-                - The answer for this is the total count of nodes in the ExpandedLL.
-            4. Show Running Time
-                - Help.
-    */
-
-   printf("\n");
-   printf("Nahanap rin sa wakas goal state.\n");
-   printf("Nag wowork pa lang so far, pag yung mismong input is Goal State na.\n\n");
-   
-   printf("[SOLUTION PATH] = \n");
-   printf("[SOLUTION COST] = \n");
-   printf("[SOLUTION SEARCH COST] = %d\n", count_total_nodes_in_ExpandedLL());
-   printf("[RUNNING TIME] = \n");
     
 }
