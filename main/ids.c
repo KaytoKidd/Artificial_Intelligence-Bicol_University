@@ -198,7 +198,7 @@ void insert_to_FringeLL(int to_insert_level, int to_insert_arr[16]) {
     }
     new_node -> next = NULL;
     
-    print_the_FringeLL();
+    //print_the_FringeLL();
 
 }
 
@@ -285,10 +285,11 @@ int check_if_already_in_ExpandedLL(int to_check_arr[16]) {
 
     struct ExpandedLL *checker = expandedLL_head;
     int already_in_expanded = 0;    // 0 = false, 1 = true
-    int total_counter = 0;
     int i = 0;
 
     while(checker != NULL) {
+
+        int total_counter = 0;
 
         for(i = 0; i < 16; i++){
             if(to_check_arr[i] == checker -> expandedLL_arr[i])
@@ -473,22 +474,22 @@ void start_IDS_Expansion() {
     int movements_label_arr[4];
 
     int movements[16][3][4] = {
-        {{1}, {5, 2}, {96, 99}},                    // 0
-        {{2}, {6, 1, 3}, {97, 98, 99}},             // 1
-        {{3}, {7, 2, 40}, {97, 98, 99}},            // 2
-        {{4}, {8, 3}, {97, 98}},                    // 3
-        {{5}, {1, 9, 6}, {96, 97, 99}},             // 4
-        {{6}, {2, 10, 5, 7}, {96, 97, 98, 99}},     // 5
-        {{7}, {3, 11, 6, 8}, {96, 97, 98, 99}},     // 6
-        {{8}, {4, 12, 7}, {96, 97, 98}},            // 7
-        {{9}, {5, 13, 10}, {96, 97, 99}},           // 8
-        {{10}, {6, 14, 9, 11}, {96, 97, 98, 99}},   // 9
-        {{11}, {7, 15, 10, 12}, {96, 97, 98, 99}},  // 10
-        {{12}, {8, 16, 11}, {96, 97, 98}},          // 11
-        {{13}, {9, 14}, {96, 99}},                  // 12
-        {{14}, {10, 13, 15}, {96, 98, 99}},         // 13
-        {{15}, {11, 14, 16}, {96, 98, 99}},         // 14
-        {{16}, {12, 15}, {96, 98}}                  // 15
+        {{0}, {4, 1}, {96, 99}},                    // 0
+        {{1}, {5, 0, 2}, {97, 98, 99}},             // 1
+        {{2}, {6, 1, 3}, {97, 98, 99}},            // 2
+        {{3}, {7, 2}, {97, 98}},                    // 3
+        {{4}, {0, 8, 5}, {96, 97, 99}},             // 4
+        {{5}, {1, 9, 4, 6}, {96, 97, 98, 99}},     // 5
+        {{6}, {2, 10, 5, 7}, {96, 97, 98, 99}},     // 6
+        {{7}, {3, 11, 6}, {96, 97, 98}},            // 7
+        {{8}, {4, 12, 9}, {96, 97, 99}},           // 8
+        {{9}, {5, 13, 8, 10}, {96, 97, 98, 99}},   // 9
+        {{10}, {6, 14, 9, 11}, {96, 97, 98, 99}},  // 10
+        {{11}, {7, 15, 10}, {96, 97, 98}},          // 11
+        {{12}, {8, 13}, {96, 99}},                  // 12
+        {{13}, {9, 12, 14}, {96, 98, 99}},         // 13
+        {{14}, {10, 13, 15}, {96, 98, 99}},         // 14
+        {{15}, {11, 14}, {96, 98}}                  // 15
     };
 
     int x = index_of_negative_one;
@@ -513,7 +514,7 @@ void start_IDS_Expansion() {
 
     // Exchange Index
     i = 0;
-    while(movements_index_arr[i] != 0 || i != 4) {
+    while(movements_index_arr[i] != 0 && i != 4) {
 
         // Copy to_expand_arr to temp_expand_arr.
         int temp_expand_arr[16];
@@ -547,7 +548,7 @@ void start_IDS_Expansion() {
     i = 0;
     if(initial_solutionpath_insertion == 1 && iteration_level >= 1) {   // True, it is the initial insertion of solution path.
 
-        while(movements_label_arr[i] != 0 || i != 4) {
+        while(movements_label_arr[i] != 0 && i != 4) {
 
             struct SolutionPathLL *new_node = (struct SolutionPathLL *)malloc(sizeof(struct SolutionPathLL));
             struct SolutionPathLL *iterator;
@@ -564,6 +565,8 @@ void start_IDS_Expansion() {
 
             new_node -> movement = movements_label_arr[i];
             new_node -> next = NULL;
+
+            i++;
             
         }
 
@@ -718,6 +721,7 @@ void main() {
 
     // Start IDS Algorithm
     while(goal_state_found == 0) {  // 0 = false (not found, continue), 1 = true (found, end program)
+        printf("-----------------------------------------------------LEVEL = %d\n", iteration_level);
         insert_to_FringeLL(to_expand_arr_level, user_input_arr);  // 0 = Level 0, ROOT.
         start_IDS();
 
