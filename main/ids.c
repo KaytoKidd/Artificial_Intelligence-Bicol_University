@@ -129,7 +129,6 @@ void get_user_input() {
     }
 
     print_userInput_in_boardGuide(user_input_arr);
-    // insert_to_FringeLL(0, user_input_arr);  // 0 = Level 0, ROOT.
 
 }
 
@@ -234,7 +233,7 @@ void remove_from_FringeLL(int to_remove_arr[16]) {
         fringeLL_head = fringeLL_head -> next;
     else
         connector -> next = deleter -> next;
-
+    
     free(deleter);
 
 }
@@ -313,32 +312,26 @@ int check_if_already_in_ExpandedLL(int to_check_arr[16]) {
 // IDS Computation - Definition
 void start_IDS() {
 
-    perform_this:
-    remove_from_FringeLL(to_expand_arr);
-    insert_to_ExpandedLL(to_expand_arr);
-    check_whether_GoalState(to_expand_arr);
+    perform_this_again:
+    find_which_to_expand();
 
-    if(goal_state_found == 1) {
+    if(fringe_is_empty != 1) {
 
-        todo_when_IDSGoalState_found();
+        remove_from_FringeLL(to_expand_arr);
+        insert_to_ExpandedLL(to_expand_arr);
+        check_whether_GoalState(to_expand_arr);
 
-    } else {
-
-        if(check_if_possible_to_expand() == 1) {    // Possible to expand
-            
-            start_IDS_Expansion();
-            find_which_to_expand();
-            goto perform_this;
-
-        } else {    // Not possible to expand.
-
-            if(iteration_level >= 1)
-                remove_from_SolutionPathLL();
-
-            find_which_to_expand();
-            if(fringe_is_empty == 0) // Fringe is not empty. We will continue
-                goto perform_this;
+        if(goal_state_found == 1) {
+            todo_when_IDSGoalState_found();
+        } else {
+            if(check_if_possible_to_expand() == 1) {    // Possible to expand
+                start_IDS_Expansion();
+            } else {                                    // Not possible to expand.
+                if(iteration_level >= 1)
+                    remove_from_SolutionPathLL();
+            }
         }
+        goto perform_this_again;
 
     }
 
@@ -725,6 +718,7 @@ void main() {
 
     // Start IDS Algorithm
     while(goal_state_found == 0) {  // 0 = false (not found, continue), 1 = true (found, end program)
+        insert_to_FringeLL(to_expand_arr_level, user_input_arr);  // 0 = Level 0, ROOT.
         start_IDS();
 
         if(goal_state_found == 1)
@@ -733,6 +727,8 @@ void main() {
         free_FringeLL_ExpandedLL_SolutionPathLL();
         levelRestarted_restartAllGlobalVariable();
         iteration_level++;
+
+        printf("-----------------------------------------------------LEVEL = %d\n", iteration_level);
     }
     
 }
