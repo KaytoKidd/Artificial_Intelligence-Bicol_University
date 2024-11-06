@@ -73,6 +73,7 @@ void levelRestarted_restartAllGlobalVariable();
 
 // Solution Path - Declaration
 void insert_to_SolutionPathLL(int to_insert_movement);
+void remove_from_SolutionPathLL();
 
 // IDS Computation (When Goal is Found) - Declaration
 void todo_when_IDSGoalState_found();
@@ -603,6 +604,25 @@ void insert_to_SolutionPathLL(int to_insert_movement) {
 
     new_node -> movement = to_insert_movement;
     new_node -> next = NULL;
+
+}
+
+void remove_from_SolutionPathLL() {
+
+    struct SolutionPathLL *deleter = solutionPathLL_head[which_solutionPath_head];
+    struct SolutionPathLL *connector;
+
+    if(solutionPathLL_head[which_solutionPath_head] -> next == NULL) {  // Only one left node.
+        solutionPathLL_head[which_solutionPath_head] = NULL;
+        which_solutionPath_head++;
+    } else {    // >= 2 number of nodes.
+        while(deleter -> next != NULL) {
+            connector = deleter;
+            deleter = deleter -> next;
+        }
+        connector -> next = NULL;
+    }
+    free(deleter);
 
 }
 
