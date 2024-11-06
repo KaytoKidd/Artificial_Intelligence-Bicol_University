@@ -46,6 +46,7 @@ int fringe_is_empty = 0;
 
 // Global Variables - Declaration (Used for Solution Path)
 int initial_solutionpath_insertion = 1;  // 1 = true, 0 = false
+int which_solutionPath_head = 0;
 
 // User Input - Declaration
 void board_guide();
@@ -71,6 +72,7 @@ void start_IDS_Expansion();
 void levelRestarted_restartAllGlobalVariable();
 
 // Solution Path - Declaration
+void insert_to_SolutionPathLL(int to_insert_movement);
 
 // IDS Computation (When Goal is Found) - Declaration
 void todo_when_IDSGoalState_found();
@@ -323,6 +325,8 @@ void start_IDS() {
         if(check_if_possible_to_expand() == 1) {    // Possible to expand
             
             start_IDS_Expansion();
+            find_which_to_expand();
+            goto perform_this;
 
         } else {    // Not possible to expand.
 
@@ -522,6 +526,12 @@ void start_IDS_Expansion() {
 
         }
 
+        if(initial_solutionpath_insertion == 0) {
+
+            insert_to_SolutionPathLL(movements_label_arr[i]);
+
+        }
+
         i++;
 
     }
@@ -556,8 +566,6 @@ void start_IDS_Expansion() {
         // Note: This only works if Level is >= 1.
         // Note: When Level 0, it will not do anything.
 
-    } else {    // False, not the initial insertion for solution path.
-
     }
 
 }
@@ -578,6 +586,23 @@ void levelRestarted_restartAllGlobalVariable() {
     fringe_is_empty = 0;
 
     initial_solutionpath_insertion = 1;
+
+}
+
+// Solution Path - Definition
+void insert_to_SolutionPathLL(int to_insert_movement) {
+
+    struct SolutionPathLL *new_node = (struct SolutionPathLL *)malloc(sizeof(struct SolutionPathLL));
+    struct SolutionPathLL *iterator;
+
+    iterator = solutionPathLL_head[which_solutionPath_head];
+    while(iterator -> next != NULL) {
+        iterator = iterator -> next;
+    }
+    iterator -> next = new_node;
+
+    new_node -> movement = to_insert_movement;
+    new_node -> next = NULL;
 
 }
 
