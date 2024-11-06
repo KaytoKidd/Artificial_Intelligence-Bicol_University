@@ -78,6 +78,7 @@ void remove_from_SolutionPathLL();
 // IDS Computation (When Goal is Found) - Declaration
 void todo_when_IDSGoalState_found();
 int count_total_nodes_in_ExpandedLL();
+void get_the_solution_path_to_goal();
 
 // User Input - Definition
 void board_guide() {
@@ -598,6 +599,7 @@ void levelRestarted_restartAllGlobalVariable() {
     fringe_is_empty = 0;
 
     initial_solutionpath_insertion = 1;
+    which_solutionPath_head = 0;
 
 }
 
@@ -656,11 +658,14 @@ void todo_when_IDSGoalState_found() {
                 - Help.
     */
 
-    int solution_search_cost = count_total_nodes_in_ExpandedLL();
-
     printf("[SOLUTION PATH] = \n");
+    get_the_solution_path_to_goal();
+
     printf("[SOLUTION COST] = \n");
+
+    int solution_search_cost = count_total_nodes_in_ExpandedLL();
     printf("[SOLUTION SEARCH COST] = %d\n", solution_search_cost);
+    
     printf("[RUNNING TIME] = \n");
 
 }
@@ -676,6 +681,40 @@ int count_total_nodes_in_ExpandedLL() {
     }
 
     return total_count;
+
+}
+
+void get_the_solution_path_to_goal() {
+
+    struct SolutionPathLL *printer = solutionPathLL_head[which_solutionPath_head];
+    int found_movement = 0;
+
+    while(printer != NULL) {
+
+        found_movement = printer -> movement;
+
+        switch(found_movement) {
+            case 96:
+                printf("UP");
+                break;
+            case 97:
+                printf("DOWN");
+                break;
+            case 98:
+                printf("LEFT");
+                break;
+            case 99:
+                printf("RIGHT");
+                break;
+        }
+
+        if(printer -> next != NULL)
+            printf(" -> ");
+
+        printer = printer -> next;
+    }
+
+    printf("\n");
 
 }
 
