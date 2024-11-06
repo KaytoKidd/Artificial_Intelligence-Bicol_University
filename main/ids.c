@@ -331,6 +331,9 @@ void start_IDS() {
 
         } else {    // Not possible to expand.
 
+            if(iteration_level >= 1)
+                remove_from_SolutionPathLL();
+
             find_which_to_expand();
             if(fringe_is_empty == 0) // Fringe is not empty. We will continue
                 goto perform_this;
@@ -400,7 +403,16 @@ void free_FringeLL_ExpandedLL_SolutionPathLL() {
     fringeLL_head = NULL;
 
     // SolutionPathLL
-    // Add code here later.
+    int i = 0;
+    for(i = 0; i < 4; i++) {
+        struct SolutionPathLL *solutionPathLL_freer = solutionPathLL_head[i];
+        
+        while(solutionPathLL_head[i] != NULL) {
+            solutionPathLL_freer = solutionPathLL_head[i];
+            solutionPathLL_head[i] = solutionPathLL_head[i] -> next;
+            free(solutionPathLL_freer);
+        }
+    }
 
 }
 
@@ -676,11 +688,6 @@ void main() {
     // Start IDS Algorithm
     while(goal_state_found == 0) {  // 0 = false (not found, continue), 1 = true (found, end program)
         start_IDS();
-
-        if(goal_state_found != 0)   // 1 = Goal State Found.
-            break;
-        
-        // The following code below will not be run when the if statement above is true.
         free_FringeLL_ExpandedLL_SolutionPathLL();
         levelRestarted_restartAllGlobalVariable();
         iteration_level++;
