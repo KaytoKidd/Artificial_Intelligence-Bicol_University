@@ -687,6 +687,10 @@ void main() {
     // Start IDS Algorithm
     while(goal_state_found == 0) {  // 0 = false (not found, continue), 1 = true (found, end program)
         start_IDS();
+
+        if(goal_state_found == 1)
+            break;
+
         free_FringeLL_ExpandedLL_SolutionPathLL();
         levelRestarted_restartAllGlobalVariable();
         iteration_level++;
