@@ -595,7 +595,6 @@ void levelRestarted_restartAllGlobalVariable() {
 
     to_expand_arr_level = 0;
     index_of_negative_one = 0;
-    iteration_level = 0;
     fringe_is_empty = 0;
 
     initial_solutionpath_insertion = 1;
