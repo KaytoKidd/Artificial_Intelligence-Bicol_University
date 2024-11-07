@@ -39,6 +39,12 @@ void start_initialization() {
 
     expanded.clear();
     fringe.clear();
+    fringe_level.clear();
+    to_expand.clear();
+
+    to_expand_level = 0;
+    goal_state_found = 0;
+
     fringe.push_back(user_input);
     fringe_level.push_back(0);
 
@@ -58,13 +64,8 @@ bool possible_to_expand() {
 
 void remove_from_fringe() {
 
-    for(int i = 0; i < fringe.size(); i++) {
-        if(fringe[i] == to_expand) {
-            fringe.pop_back();
-            fringe_level.pop_back();
-            break;
-        }
-    }
+    fringe.pop_back();
+    fringe_level.pop_back();
 
 }
 
@@ -158,8 +159,9 @@ void start_expanding() {
         movements_label.push_back(movements[x][label_y][i]);
     }
 
-    vector<int> to_expand_for_exchanging = to_expand;
     for(int i = 0; i < movements_index.size(); i++) {
+
+        vector<int> to_expand_for_exchanging = to_expand;
 
         // Exchange Value Per Index
         int temp = to_expand_for_exchanging[index_of_negative_one];
@@ -169,6 +171,8 @@ void start_expanding() {
         if(check_whether_already_in_expanded(to_expand_for_exchanging) == false) {
             // Then add to fringe
             // Then add to fringe_level
+            fringe.push_back(to_expand_for_exchanging);
+            fringe_level.push_back(to_expand_level + 1);
         }
     }
 
@@ -213,7 +217,8 @@ int main() {
 
         depth_limit++;
     }
-    printf("GOAL FOUND!");
+    cout << "GOAL FOUND!\n";
+    cout << "Total Level Generated = " << depth_limit << "\n";
     return 0;
 
 }
