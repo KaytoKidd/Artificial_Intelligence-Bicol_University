@@ -11,6 +11,7 @@ vector<int> to_expand;
 
 int to_expand_level = 0;
 int depth_limit = 0;
+int goal_state_found = 0;   // 0 = not found, 1 = found
 
 void get_user_input() {
 
@@ -76,6 +77,7 @@ void insert_to_expanded() {
 bool check_if_goal() {
 
     if(to_expand == goal_state) {
+        goal_state_found = 1;
         return true;
     } else {
         return false;
@@ -94,37 +96,63 @@ bool should_be_expanded() {
 }
 
 void start_expanding() {
-
+    
     /*
         Priority of Movements
         96 - UP
         97 - LEFT
         98 - DOWN
         99 - RIGHT
-    */
 
-   vector<vector<vector<int>>> movements = {
-        {{4, 1},{98, 99}}, // 0
-        {{0, 5, 2},{97, 98, 99}}, // 1
-        {{1, 6, 3},{97, 98, 99}}, // 2
-        {{2, 7},{97, 98}}, // 3
-        {{0, 8, 5},{96, 98, 99}}, // 4
-        {{1, 4, 9, 6},{96, 97, 98, 99}}, // 5
-        {{2, 5, 10, 7},{96, 97, 98, 99}}, // 6
-        {{3, 6, 11},{96, 97, 98}}, // 7
-        {{4, 12, 9},{96, 98, 99}}, // 8
-        {{5, 8, 13, 10},{96, 97, 98, 99}}, // 9
-        {{6, 9, 14, 11},{96, 97, 98, 99}}, // 10
-        {{7, 10, 15},{96, 97, 98}}, // 11
-        {{8, 13},{96, 99}}, // 12
-        {{9, 12, 14},{96, 97, 99}}, // 13
-        {{10, 13, 15},{96, 97, 99}}, // 14
-        {{11, 14},{96, 97}}  // 15
-   };
+    NOTE: We need to reverse so that push-pop will still follow
+          the priority UP -> DOWN -> LEFT -> RIGHT
+    */
+    vector<vector<vector<int>>> movements = {
+        {{1, 4},{99, 98}}, // 0
+        {{2, 5, 0},{99, 98, 97}}, // 1
+        {{3, 6, 1},{99, 98, 97}}, // 2
+        {{7, 2},{98, 97}}, // 3
+        {{5, 8, 0},{99, 98, 96}}, // 4
+        {{6, 9, 4, 1},{99, 98, 97, 96}}, // 5
+        {{7, 10, 5, 2},{99, 98, 97, 96}}, // 6
+        {{11, 6, 3},{98, 97, 96}}, // 7
+        {{9, 12, 4},{99, 98, 96}}, // 8
+        {{10, 13, 8, 5},{99, 98, 97, 96}}, // 9
+        {{11, 14, 9 ,6},{99, 98, 97, 96}}, // 10
+        {{15, 10, 7},{98, 97, 96}}, // 11
+        {{13, 8},{99, 96}}, // 12
+        {{14, 12, 9},{99, 97, 96}}, // 13
+        {{15, 13, 10},{99, 97, 96}}, // 14
+        {{14, 11},{97, 96}}  // 15
+    };
+
+    //for(int i = 0; i < movements)
+
+    int index_of_negative_one = 0;
+    for(int i = 0; i < to_expand.size(); i++) {
+        if(to_expand[i] == -1) {
+            index_of_negative_one = i;
+            break;
+        }
+    }
+
+    int x = index_of_negative_one;
+    int index_y = 0;
+    int label_y = 1;
+
+    vector<int> movements_index;
+    vector<int> movements_label;
+
+    for(int i = 0; i < movements[x][index_y].size(); i++) {
+        movements_index.push_back(movements[x][index_y][i]);
+        movements_label.push_back(movements[x][label_y][i]);
+    }
 
 }
 
 void start_IDS() {
+
+    continue_and_go_here:
 
     if(possible_to_expand() == true) {      // Fringe is not empty.
         
@@ -132,10 +160,13 @@ void start_IDS() {
         insert_to_expanded();
         if(check_if_goal() == true) {
 
+            // Nothing yet.
+
         } else {
             if(should_be_expanded() == true) {
                 start_expanding();
             }
+            goto continue_and_go_here;
         }
 
     }
@@ -151,8 +182,14 @@ int main() {
     while(true) {
         start_initialization();
         start_IDS();
+
+        if(goal_state_found == 1) {
+            break;
+        }
+
         depth_limit++;
     }
+    printf("GOAL FOUND!");
     return 0;
 
 }
