@@ -95,6 +95,18 @@ bool should_be_expanded() {
 
 }
 
+bool check_whether_already_in_expanded(vector<int> to_expand_for_exchanging) {
+
+    for(int i = 0; i < expanded.size(); i++) {
+        if(to_expand_for_exchanging == expanded[i]) {
+            return true;
+        }
+    }
+
+    return false;
+
+}
+
 void start_expanding() {
     
     /*
@@ -126,8 +138,6 @@ void start_expanding() {
         {{14, 11},{97, 96}}  // 15
     };
 
-    //for(int i = 0; i < movements)
-
     int index_of_negative_one = 0;
     for(int i = 0; i < to_expand.size(); i++) {
         if(to_expand[i] == -1) {
@@ -146,6 +156,20 @@ void start_expanding() {
     for(int i = 0; i < movements[x][index_y].size(); i++) {
         movements_index.push_back(movements[x][index_y][i]);
         movements_label.push_back(movements[x][label_y][i]);
+    }
+
+    vector<int> to_expand_for_exchanging = to_expand;
+    for(int i = 0; i < movements_index.size(); i++) {
+
+        // Exchange Value Per Index
+        int temp = to_expand_for_exchanging[index_of_negative_one];
+        to_expand_for_exchanging[index_of_negative_one] = to_expand_for_exchanging[movements_index[i]];
+        to_expand_for_exchanging[movements_index[i]] = temp;
+
+        if(check_whether_already_in_expanded(to_expand_for_exchanging) == false) {
+            // Then add to fringe
+            // Then add to fringe_level
+        }
     }
 
 }
