@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
+#include <chrono>
 using namespace std;
 
 vector<int> goal_state = {-1, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
@@ -18,11 +19,10 @@ int to_expand_label = 0;
 int to_expand_level = 0;
 int depth_limit = 0;
 int goal_state_found = 0;   // 0 = not found, 1 = found
-int total_running_time = 0;
 
 void get_user_input() {
 
-    printf("Table Guide:\n1  2  3  4\n5  6  7  8\n9  10 11 12\n13 14 15 16\n\n");
+    printf("[TABLE GUIDE]\n1  2  3  4\n5  6  7  8\n9  10 11 12\n13 14 15 16\n\n");
     int the_input;
 
     for(int i = 0; i < 16; i++) {
@@ -35,10 +35,11 @@ void get_user_input() {
 
 void print_user_input() {
 
-    for(int i : user_input) {
-        cout << i << " ";
+    cout << "\n[USER DEFINED TABLE/INITIAL STATE]\n";
+    for(int i = 0; i < user_input.size(); i++) {
+        cout << user_input[i] << " ";
+        if((i + 1) % 4 == 0) {cout << "\n";}
     }
-    cout << "\n";
 
 }
 
@@ -56,7 +57,6 @@ void start_initialization() {
     to_expand_label = 0;
     to_expand_level = 0;
     goal_state_found = 0;
-    total_running_time = 0;
 
     fringe.push_back(user_input);
     fringe_level.push_back(0);
@@ -300,7 +300,7 @@ void get_solutionPath_IDS() {
 
 void to_do_when_IDS_GoalFound() {
 
-    // to_expand
+    cout << "\n[FINAL TABLE]\n";
     for(int i = 0; i < to_expand.size(); i++) {
         cout << to_expand[i] << " ";
         if((i + 1) % 4 == 0) {
@@ -308,23 +308,23 @@ void to_do_when_IDS_GoalFound() {
         }
     }
 
-    cout << "Solution Path = ";
+    cout << "\n[REQUIREMENTS]";
+    cout << "\nSolution Path: ";
     get_solutionPath_IDS();
 
-    cout << "Solution Cost = " << depth_limit << "\n";
-    cout << "Number of Nodes Expanded = " << expanded.size() << "\n";
-    cout << "Running Time = " << total_running_time << "\n";
+    cout << "Solution Cost: " << depth_limit << "\n";
+    cout << "Number of Nodes Expanded: " << expanded.size() << "\n";
 
 }
 
 int main() {
 
-    // Running Time - Starts here.
-
     get_user_input();
     print_user_input();
 
-    // Start IDS here.
+    auto start = std::chrono::high_resolution_clock::now(); // Running Time - Start
+
+    // Start IDS
     while(true) {
         start_initialization();
         start_IDS();
@@ -336,9 +336,12 @@ int main() {
         depth_limit++;
     }
 
-    // Running time, ends here.
+    auto end = std::chrono::high_resolution_clock::now();   // Running Time - End
+    std::chrono::duration<double> duration = end - start;   // Calculate duration
     
     to_do_when_IDS_GoalFound();
+    std::cout << "Running Time: " << duration.count() << " seconds" << std::endl; // Output in seconds.
+
     return 0;
 
 }
