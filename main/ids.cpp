@@ -126,7 +126,7 @@ bool should_be_expanded() {
 
 void check_if_move_index_IDS_SolutionPath() {
 
-    if(all_of(fringe_level.begin(), fringe_level.end(), [](int value) {return value == 1;})) {
+    if(all_of(fringe_level.begin(), fringe_level.end(), [](int value) {return value == 1;}) || fringe_level.empty() == true) {
         solutionpath_ids.pop_back();
     }
 
@@ -182,7 +182,7 @@ void start_expanding() {
             break;
         }
     }
-    
+
     int x = index_of_negative_one;
     int index_y = 0;
     int label_y = 1;
@@ -286,6 +286,14 @@ void get_solutionPath_IDS() {
 }
 
 void to_do_when_IDS_GoalFound() {
+
+    // to_expand
+    for(int i = 0; i < to_expand.size(); i++) {
+        cout << to_expand[i] << " ";
+        if((i + 1) % 4 == 0) {
+            cout << "\n";
+        }
+    }
 
     cout << "Solution Path = ";
     get_solutionPath_IDS();
