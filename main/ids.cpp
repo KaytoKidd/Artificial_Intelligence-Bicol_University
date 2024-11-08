@@ -114,20 +114,25 @@ bool check_if_goal() {
 bool should_be_expanded() {
 
     if(to_expand_level == depth_limit) {
+
         if(current_level_ids >= 1) {
-            solutionpath_ids[solutionpath_ids.size() - 1].pop_back();
+            int check_existence = to_expand_level;
+            while(true) {
+                if(check_existence == 1) {
+                    solutionpath_ids.pop_back();
+                    break;
+                }
+                solutionpath_ids[solutionpath_ids.size() - 1].pop_back();
+                if(find(fringe_level.begin(), fringe_level.end(), check_existence) != fringe_level.end()) {
+                    break;
+                }
+                check_existence--;
+            }
         }
         return false;
+
     } else {
         return true;
-    }
-
-}
-
-void check_if_move_index_IDS_SolutionPath() {
-
-    if(all_of(fringe_level.begin(), fringe_level.end(), [](int value) {return value == 1;}) || fringe_level.empty() == true) {
-        solutionpath_ids.pop_back();
     }
 
 }
@@ -225,7 +230,18 @@ void start_expanding() {
     sol_path_initialization = 0;
 
     if(total_found == 0) {
-        solutionpath_ids[solutionpath_ids.size() - 1].pop_back();
+        int check_existence = to_expand_level;
+        while(true) {
+            if(check_existence == 1) {
+                solutionpath_ids.pop_back();
+                break;
+            }
+            solutionpath_ids[solutionpath_ids.size() - 1].pop_back();
+            if(find(fringe_level.begin(), fringe_level.end(), check_existence) != fringe_level.end()) {
+                break;
+            }
+            check_existence--;
+        }
     }
 
 }
@@ -248,9 +264,6 @@ void start_IDS() {
                 start_expanding();
             }
 
-            if(current_level_ids >= 1) {
-                check_if_move_index_IDS_SolutionPath();
-            }
             current_level_ids++;
             goto continue_and_go_here;
 
