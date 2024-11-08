@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <algorithm>
 using namespace std;
 
 vector<int> goal_state = {-1, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
@@ -7,11 +8,17 @@ vector<int> user_input;
 vector<vector<int>> expanded;
 vector<vector<int>> fringe;
 vector<int> fringe_level;
+vector<int> fringe_label;
+vector<vector<int>> solutionpath_ids;
 vector<int> to_expand;
 
+int current_level_ids = 0;
+int sol_path_initialization = 1;    // 1 = true, 0 = false
+int to_expand_label = 0;
 int to_expand_level = 0;
 int depth_limit = 0;
 int goal_state_found = 0;   // 0 = not found, 1 = found
+int total_running_time = 0;
 
 void get_user_input() {
 
@@ -40,10 +47,16 @@ void start_initialization() {
     expanded.clear();
     fringe.clear();
     fringe_level.clear();
+    fringe_label.clear();
+    solutionpath_ids.clear();
     to_expand.clear();
 
+    current_level_ids = 0;
+    sol_path_initialization = 1;
+    to_expand_label = 0;
     to_expand_level = 0;
     goal_state_found = 0;
+    total_running_time = 0;
 
     fringe.push_back(user_input);
     fringe_level.push_back(0);
@@ -57,6 +70,9 @@ bool possible_to_expand() {
     } else {
         to_expand = fringe.back();
         to_expand_level = fringe_level.back();
+        if(current_level_ids >= 1) {
+            to_expand_label = fringe_label.back();
+        }
         return true;
     }
 
@@ -66,12 +82,21 @@ void remove_from_fringe() {
 
     fringe.pop_back();
     fringe_level.pop_back();
+    if(current_level_ids >= 1) {
+        fringe_label.pop_back();
+    }
 
 }
 
 void insert_to_expanded() {
 
     expanded.push_back(to_expand);
+
+}
+
+void insert_to_solutionpathids() {
+
+    solutionpath_ids[solutionpath_ids.size() - 1].push_back(to_expand_label);
 
 }
 
@@ -89,9 +114,20 @@ bool check_if_goal() {
 bool should_be_expanded() {
 
     if(to_expand_level == depth_limit) {
+        if(current_level_ids >= 1) {
+            solutionpath_ids[solutionpath_ids.size() - 1].pop_back();
+        }
         return false;
     } else {
         return true;
+    }
+
+}
+
+void check_if_move_index_IDS_SolutionPath() {
+
+    if(all_of(fringe_level.begin(), fringe_level.end(), [](int value) {return value == 1;})) {
+        solutionpath_ids.pop_back();
     }
 
 }
@@ -146,7 +182,7 @@ void start_expanding() {
             break;
         }
     }
-
+    
     int x = index_of_negative_one;
     int index_y = 0;
     int label_y = 1;
@@ -159,6 +195,7 @@ void start_expanding() {
         movements_label.push_back(movements[x][label_y][i]);
     }
 
+    int total_found = 0;
     for(int i = 0; i < movements_index.size(); i++) {
 
         vector<int> to_expand_for_exchanging = to_expand;
@@ -173,7 +210,22 @@ void start_expanding() {
             // Then add to fringe_level
             fringe.push_back(to_expand_for_exchanging);
             fringe_level.push_back(to_expand_level + 1);
+            fringe_label.push_back(movements_label[i]);
+
+            total_found++;
         }
+
+        if(sol_path_initialization == 1) {
+            vector<int> temp_vector;
+            temp_vector.push_back(movements_label[i]);
+            solutionpath_ids.push_back(temp_vector);
+        }
+
+    }
+    sol_path_initialization = 0;
+
+    if(total_found == 0) {
+        solutionpath_ids[solutionpath_ids.size() - 1].pop_back();
     }
 
 }
@@ -186,22 +238,67 @@ void start_IDS() {
         
         remove_from_fringe();
         insert_to_expanded();
-        if(check_if_goal() == true) {
+        if(current_level_ids >= 1) {
+            insert_to_solutionpathids();
+        }
+        
+        if(check_if_goal() == false) {
 
-            // Nothing yet.
-
-        } else {
             if(should_be_expanded() == true) {
                 start_expanding();
             }
+
+            if(current_level_ids >= 1) {
+                check_if_move_index_IDS_SolutionPath();
+            }
+            current_level_ids++;
             goto continue_and_go_here;
+
         }
 
     }
 
 }
 
+void get_solutionPath_IDS() {
+
+    if(current_level_ids >= 1) {
+        vector<int> final_solutionpath_ids(solutionpath_ids[solutionpath_ids.size() - 1].begin() + 1, solutionpath_ids[solutionpath_ids.size() - 1].end());
+        for(int i : final_solutionpath_ids) {
+            switch(i) {
+                case 96:
+                    cout << "UP -> ";
+                    break;
+                case 97:
+                    cout << "LEFT -> ";
+                    break;
+                case 98:
+                    cout << "DOWN -> ";
+                    break;
+                case 99:
+                    cout << "RIGHT -> ";
+                    break;
+            }
+        }
+    }
+    cout << "GOAL\n";
+
+}
+
+void to_do_when_IDS_GoalFound() {
+
+    cout << "Solution Path = ";
+    get_solutionPath_IDS();
+
+    cout << "Solution Cost = " << depth_limit << "\n";
+    cout << "Number of Nodes Expanded = " << expanded.size() << "\n";
+    cout << "Running Time = " << total_running_time << "\n";
+
+}
+
 int main() {
+
+    // Running Time - Starts here.
 
     get_user_input();
     print_user_input();
@@ -217,8 +314,10 @@ int main() {
 
         depth_limit++;
     }
-    cout << "GOAL FOUND!\n";
-    cout << "Total Level Generated = " << depth_limit << "\n";
+
+    // Running time, ends here.
+    
+    to_do_when_IDS_GoalFound();
     return 0;
 
 }
